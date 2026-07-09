@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: "💬 Ask a study question / discuss"
+    url: https://github.com/OWNER/REPO/discussions
+    about: For study questions and general discussion, please use Discussions.
