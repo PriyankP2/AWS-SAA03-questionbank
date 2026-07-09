@@ -135,3 +135,209 @@ sequenceDiagram
 </details>
 
 ---
+
+## Q3 — Stop users bypassing CloudFront to reach S3 directly
+**Domain:** 1 — Design Secure Architectures · **Difficulty:** 🟡 Medium · **Concept:** Restricting an S3 origin so content is only reachable through CloudFront.
+
+**Scenario:** A company serves static assets from an S3 bucket through a CloudFront distribution, where it applies AWS WAF rules and geo-restrictions. Right now the bucket is public, so anyone who learns the bucket URL can fetch objects **directly**, bypassing every edge control. The team wants users to reach content **only through CloudFront**, keeping the bucket private, with the **MOST secure** current approach.
+
+**Question:** Which configuration is the **MOST secure**, AWS-recommended way to achieve this?
+
+**Options:**
+- A. Keep the bucket public but add a bucket policy that only allows requests carrying a secret custom `Referer` header set by CloudFront.
+- B. Leave the bucket policy open (`Principal: "*"`) and rely on the CloudFront distribution to front all traffic.
+- C. Make the bucket private and use **CloudFront Origin Access Control (OAC)**, with a bucket policy that allows only the `cloudfront.amazonaws.com` service principal where `AWS:SourceArn` matches the distribution ARN.
+- D. Put the S3 bucket "inside" the VPC and restrict it with security groups.
+
+<details>
+<summary>▶ Reveal answer &amp; explanation</summary>
+
+**✅ Correct answer: C**
+
+**Concept tested:** Locking an S3 origin to a specific CloudFront distribution using **Origin Access Control**.
+
+**Why C is correct:** OAC lets CloudFront send **SigV4-signed** requests to a **private** bucket using a CloudFront **service principal**. The bucket policy grants `s3:GetObject` only to `cloudfront.amazonaws.com` **and** conditions it on `AWS:SourceArn = <this distribution>`, so the object is reachable only via that distribution — never by guessing the bucket URL. This keeps WAF/geo controls unbypassable and protects against the confused-deputy problem.
+
+**Why the others fail:**
+- **A:** A secret `Referer` header is a weak, spoofable control and still requires a **public** bucket. Not a security boundary.
+- **B:** `Principal: "*"` is literally a public bucket — the exact backdoor being removed.
+- **D:** S3 is a regional service with a public API; you don't place a bucket "in a VPC" or guard it with security groups. (You *can* keep traffic private with a gateway endpoint, but that scopes access to a VPC, not to a CloudFront distribution.)
+
+**Real-world nuance / trap:** Leaving a distribution on the **legacy OAI** is the most common stale finding. OAI still works but doesn't support SSE-KMS, all HTTP methods, or newer opt-in Regions.
+
+**Time-sensitive note:** **OAC launched in 2022** and is **AWS's recommended method**; OAI is legacy but still supported. New designs should use OAC ([AWS docs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html)).
+
+**Well-Architected pillar:** Security.
+
+**Diagram — correct architecture:**
+```mermaid
+flowchart LR
+    User((Viewers)) -->|HTTPS| CF["CloudFront + OAC"]
+    CF -->|"SigV4-signed request"| S3[("Private S3 Bucket")]
+    User -. "direct bucket URL" .-> Denied["❌ 403 Denied"]
+    POL["Bucket policy: allow only cloudfront.amazonaws.com<br/>where AWS:SourceArn = this distribution"] -->|enforces| S3
+    classDef edge fill:#1a73c2,color:#fff,stroke:#0b3d66
+    classDef store fill:#2e7d32,color:#fff,stroke:#14401a
+    classDef sec fill:#b3261e,color:#fff,stroke:#5c120d
+    class CF edge
+    class S3 store
+    class POL,Denied sec
+```
+
+</details>
+
+---
+
+## Q4 — Database credentials with automatic rotation
+**Domain:** 1 — Design Secure Architectures · **Difficulty:** 🟡 Medium · **Concept:** Managed secret storage with built-in rotation vs. alternatives.
+
+**Scenario:** An application connects to an Amazon RDS database using a username and password. Security policy requires the credentials to be **stored securely, retrieved by the app at runtime, and rotated automatically on a schedule** without redeploying the application. The team wants the **LEAST operational overhead**.
+
+**Question:** Which approach best meets the requirement with the **LEAST operational overhead**?
+
+**Options:**
+- A. Store the credentials in **AWS Secrets Manager** and enable **automatic rotation**; the app fetches them at runtime via an IAM-scoped API call.
+- B. Store the credentials in **SSM Parameter Store as a SecureString** and rely on it to rotate them automatically.
+- C. Inject the credentials as **plaintext environment variables** in the task/instance definition.
+- D. **Hardcode** the credentials into the application AMI.
+
+<details>
+<summary>▶ Reveal answer &amp; explanation</summary>
+
+**✅ Correct answer: A**
+
+**Concept tested:** Choosing the service that provides **built-in, managed secret rotation**.
+
+**Why A is correct:** Secrets Manager stores the secret encrypted (KMS), the app retrieves it at runtime with an IAM-scoped `GetSecretValue`, and it provides **native automatic rotation** — for RDS it can manage the rotation Lambda for you, changing the password on the database and storing the new version. No redeploys, minimal ops.
+
+**Why the others fail:**
+- **B:** Parameter Store SecureString encrypts values but **has no built-in rotation** — you'd have to build and operate your own rotation Lambda, which is *more* overhead, not less.
+- **C:** Plaintext environment variables are readable by anyone who can inspect the task/instance and don't rotate.
+- **D:** Hardcoding in an AMI is the least secure option and requires rebuilding/redeploying the AMI to change credentials.
+
+**Real-world nuance / trap:** Parameter Store is great for **configuration** and free-tier standard parameters; the distinguishing feature here is **automatic rotation**, which is Secrets Manager's native capability.
+
+**Time-sensitive note:** None.
+
+**Well-Architected pillar:** Security.
+
+**Diagram — correct architecture:**
+```mermaid
+flowchart LR
+    App["Application (EC2 / ECS / Lambda)"] -->|"GetSecretValue (IAM-scoped)"| SM["AWS Secrets Manager"]
+    SM -. "scheduled rotation" .-> Rot["Rotation Lambda"]
+    Rot -->|"set new password"| DB[("RDS / Aurora")]
+    Rot -->|"store new version"| SM
+    App -->|"connect with current creds"| DB
+    classDef svc fill:#7b2cbf,color:#fff,stroke:#3d1660
+    classDef store fill:#2e7d32,color:#fff,stroke:#14401a
+    classDef comp fill:#e37400,color:#fff,stroke:#5c2c00
+    class SM,Rot svc
+    class DB store
+    class App comp
+```
+
+</details>
+
+---
+
+## Q5 — Block a single malicious IP range from a subnet
+**Domain:** 1 — Design Secure Architectures · **Difficulty:** 🟡 Medium · **Concept:** Security groups (stateful, allow-only) vs. network ACLs (stateless, support deny).
+
+**Scenario:** A known-malicious IP range is probing your workload. You need to **explicitly deny** that IP range from reaching **all** EC2 instances in a particular subnet. Instances there use security groups that already allow required application traffic from the internet.
+
+**Question:** What is the correct way to **deny** the specific IP range?
+
+**Options:**
+- A. Add an inbound **deny** rule to the instances' **security group** for that IP range.
+- B. Add an outbound **deny** rule to the instances' **security group**.
+- C. Attach an **IAM policy** that denies the IP range.
+- D. Add an inbound **deny** rule for that IP range to the subnet's **network ACL**.
+
+<details>
+<summary>▶ Reveal answer &amp; explanation</summary>
+
+**✅ Correct answer: D**
+
+**Concept tested:** Only **network ACLs** can express an explicit **deny**; security groups are allow-only.
+
+**Why D is correct:** Network ACLs are **stateless** and evaluated at the **subnet boundary**, and they support both allow and **deny** rules. Adding an inbound deny for the malicious CIDR blocks it for **every** instance in the subnet — exactly the requirement.
+
+**Why the others fail:**
+- **A & B:** **Security groups have no deny rules** — they only allow. You cannot express "block this IP" with a security group.
+- **C:** IAM controls access to **AWS APIs**, not network packet flow to EC2. Wrong layer entirely.
+
+**Real-world nuance / trap:** Because NACLs are stateless, remember to allow the **ephemeral return ports** for legitimate traffic; security groups, being stateful, handle return traffic automatically. Security groups are your default allow-list; reach for NACLs when you specifically need a **deny** or subnet-wide control.
+
+**Time-sensitive note:** None.
+
+**Well-Architected pillar:** Security.
+
+**Diagram — correct architecture:**
+```mermaid
+flowchart LR
+    Bad((Malicious IP range)) --> NACL{"Network ACL on subnet<br/>stateless · supports DENY"}
+    NACL -->|"matches DENY rule"| Drop["❌ Traffic dropped"]
+    Good((Legitimate traffic)) --> NACL --> SG["Security Group<br/>stateful · ALLOW-only"] --> EC2["EC2 Instances"]
+    classDef sec fill:#b3261e,color:#fff,stroke:#5c120d
+    classDef net fill:#1a73c2,color:#fff,stroke:#0b3d66
+    classDef comp fill:#e37400,color:#fff,stroke:#5c2c00
+    class NACL,Drop sec
+    class SG net
+    class EC2 comp
+```
+
+</details>
+
+---
+
+## Q6 — Protect a web app from common exploits at the edge
+**Domain:** 1 — Design Secure Architectures · **Difficulty:** 🟠 Hard · **Concept:** AWS WAF for inline L7 filtering vs. detection/monitoring services.
+
+**Scenario:** A public web application behind an Application Load Balancer is being hit with **SQL injection** and **cross-site scripting** attempts, plus traffic from known bad IPs. The team wants to **block** these malicious requests **inline** with the **LEAST operational overhead** and without writing custom detection logic.
+
+**Question:** Which service should they use?
+
+**Options:**
+- A. Add **network ACL** rules to block the attacks.
+- B. Tighten **security group** rules on the ALB.
+- C. Attach **AWS WAF** with **AWS Managed Rules** (SQLi, XSS, IP-reputation) to the ALB.
+- D. Enable **Amazon GuardDuty** to stop the attacks.
+
+<details>
+<summary>▶ Reveal answer &amp; explanation</summary>
+
+**✅ Correct answer: C**
+
+**Concept tested:** WAF is the **inline, Layer-7** request filter; managed rule groups remove the need to author signatures.
+
+**Why C is correct:** AWS WAF inspects **HTTP(S) request content** and can **block** SQLi/XSS patterns and known-bad IPs. **AWS Managed Rules** provide maintained rule groups for exactly these threats, so you get protection with minimal setup and no custom logic. WAF attaches directly to an ALB, CloudFront, or API Gateway.
+
+**Why the others fail:**
+- **A & B:** NACLs and security groups operate at **L3/L4 (IP/port)** — they can't inspect request bodies to detect SQL injection or XSS.
+- **D:** GuardDuty is a **threat-detection/monitoring** service; it generates findings but does **not** inline-block malicious web requests.
+
+**Real-world nuance / trap:** "Detect vs. block." GuardDuty (and Inspector, Macie, Security Hub) tell you something is wrong; **WAF acts** on the request path. The verb in the stem — *block inline* — points to WAF.
+
+**Time-sensitive note:** None.
+
+**Well-Architected pillar:** Security.
+
+**Diagram — correct architecture:**
+```mermaid
+flowchart LR
+    User((Internet traffic)) --> WAF["AWS WAF<br/>+ AWS Managed Rules<br/>(SQLi, XSS, IP reputation)"]
+    WAF -->|"clean requests"| ALB["Application Load Balancer"]
+    WAF -. "malicious requests" .-> Drop["❌ Blocked at edge"]
+    ALB --> App["EC2 / ECS Web App"]
+    classDef sec fill:#b3261e,color:#fff,stroke:#5c120d
+    classDef net fill:#1a73c2,color:#fff,stroke:#0b3d66
+    classDef comp fill:#e37400,color:#fff,stroke:#5c2c00
+    class WAF,Drop sec
+    class ALB net
+    class App comp
+```
+
+</details>
+
+---

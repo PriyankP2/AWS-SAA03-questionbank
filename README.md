@@ -22,10 +22,13 @@ Built for people who want to understand the *reasoning* behind the answer, not j
 │   └── domain-4-cost-optimization.md# Design Cost-Optimized Architectures (20%)
 ├── prompts/
 │   └── question-generator.md        # the prompt used to draft new questions
+├── docs/                            # maintainer launch aids (welcome post, starter issues)
 ├── QUESTION_TEMPLATE.md             # the required format for every question
 ├── CONTRIBUTING.md                  # how to add questions or fix errors
 └── CODE_OF_CONDUCT.md
 ```
+
+**Launching with 20 questions across all four domains.** Maintainers: see [`docs/welcome-post.md`](docs/welcome-post.md) for a pinnable welcome message and [`docs/good-first-issues.md`](docs/good-first-issues.md) for ready-to-open starter issues.
 
 ## How to use it
 
