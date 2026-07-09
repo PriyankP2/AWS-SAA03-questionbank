@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAA-C03 · 50 Scenario Questions — The Architect's Drafting Book</title>
+<style>
+:root{
+  --ink:#10233f; --navy:#0b2545; --paper:#fdfdfb; --line:#c9d6e4; --faint:#eef3f8;
+  --d1:#6d28d9; --d1bg:#f3eefe;
+  --d2:#0e7490; --d2bg:#e8f6f9;
+  --d3:#c2410c; --d3bg:#fdf0e7;
+  --d4:#15803d; --d4bg:#eaf6ee;
+  --mono:ui-monospace,'SF Mono','Cascadia Code',Consolas,Menlo,monospace;
+  --sans:'Avenir Next','Segoe UI',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.55;font-size:16px}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px 80px}
+
+/* ── Hero: drafting-sheet title block ── */
+.hero{background:var(--navy);color:#fff;padding:44px 20px 36px;
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:28px 28px;}
+.hero-in{max-width:880px;margin:0 auto}
+.sheetno{font-family:var(--mono);font-size:12px;letter-spacing:.22em;color:#9fb8d8;text-transform:uppercase}
+.hero h1{font-size:clamp(28px,5vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.12;margin:10px 0 8px}
+.hero h1 em{font-style:normal;color:#ffd166}
+.hero p{color:#c6d6ea;max-width:640px;font-size:15px}
+.titleblock{display:flex;flex-wrap:wrap;gap:0;margin-top:26px;border:1px solid rgba(255,255,255,.3)}
+.tb{flex:1 1 150px;padding:10px 14px;border-right:1px solid rgba(255,255,255,.3);min-width:140px}
+.tb:last-child{border-right:0}
+.tb b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:#9fb8d8;text-transform:uppercase;margin-bottom:2px}
+.tb span{font-size:14px}
+
+/* ── Sheet index (TOC) ── */
+.toc{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:28px 0 8px}
+.toc a{display:block;text-decoration:none;color:var(--ink);border:1px solid var(--line);background:#fff;padding:12px 14px;border-top:4px solid var(--dc,var(--navy))}
+.toc a b{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dc,var(--navy));display:block}
+.toc a span{font-size:13.5px;color:#4b5c74}
+.toc a.t1{--dc:var(--d1)} .toc a.t2{--dc:var(--d2)} .toc a.t3{--dc:var(--d3)} .toc a.t4{--dc:var(--d4)}
+.howto{font-size:13.5px;color:#5a6b83;border-left:3px solid var(--line);padding:6px 12px;margin:14px 0 6px}
+
+/* ── Domain dividers ── */
+.dom{margin:54px 0 6px;padding-top:18px;border-top:3px double var(--line)}
+.dom .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--dc)}
+.dom h2{font-size:clamp(21px,3.4vw,28px);font-weight:800;letter-spacing:-.01em;color:var(--navy)}
+.dom p{color:#54657e;font-size:14px;max-width:620px}
+.dom.d1{--dc:var(--d1)} .dom.d2{--dc:var(--d2)} .dom.d3{--dc:var(--d3)} .dom.d4{--dc:var(--d4)}
+
+/* ── Question card w/ title-block header ── */
+.q{background:#fff;border:1px solid var(--line);margin:22px 0;border-left:5px solid var(--dc,var(--navy))}
+.q.d1{--dc:var(--d1);--dbg:var(--d1bg)} .q.d2{--dc:var(--d2);--dbg:var(--d2bg)}
+.q.d3{--dc:var(--d3);--dbg:var(--d3bg)} .q.d4{--dc:var(--d4);--dbg:var(--d4bg)}
+.qh{display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding:9px 16px;background:var(--faint);flex-wrap:wrap}
+.qn{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--dc)}
+.stamp{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dc);border:1px solid var(--dc);padding:2px 8px;border-radius:2px;background:var(--dbg)}
+.topic{font-size:13px;color:#54657e;margin-left:auto}
+.qb{padding:16px 18px 18px}
+.qb .sc{font-size:15px;margin-bottom:12px}
+.qb .sc b{color:var(--navy)}
+ol.opts{list-style:none;counter-reset:o;margin:0 0 4px}
+ol.opts li{counter-increment:o;position:relative;padding:9px 12px 9px 44px;border:1px solid #e3eaf2;background:#fbfcfe;margin-bottom:7px;font-size:14.5px}
+ol.opts li::before{content:counter(o,upper-alpha);position:absolute;left:12px;top:8px;font-family:var(--mono);font-weight:700;font-size:13px;color:var(--dc)}
+details.ans{margin-top:12px;border:1px dashed var(--dc);background:var(--dbg)}
+details.ans summary{cursor:pointer;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--dc);padding:10px 14px;user-select:none;list-style:none}
+details.ans summary::-webkit-details-marker{display:none}
+details.ans summary::before{content:'▸ ';}
+details.ans[open] summary::before{content:'▾ '}
+.ax{padding:0 16px 14px;font-size:14.5px}
+.ax .key{display:inline-block;font-family:var(--mono);font-weight:700;background:var(--dc);color:#fff;padding:3px 10px;font-size:13px;margin-bottom:8px}
+.ax p{margin-bottom:8px}
+.ax .no{color:#5a6b83;font-size:13.5px;border-left:3px solid var(--line);padding-left:10px}
+.ax .no b{color:var(--ink)}
+
+/* ── Diagrams ── */
+figure.dg{margin:6px 0 14px;border:1px solid var(--line);background:#fff;padding:10px 8px 4px}
+figure.dg svg{width:100%;height:auto;display:block}
+figure.dg figcaption{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#7387a0;padding:6px 8px 8px;border-top:1px dashed var(--line);margin-top:6px}
+
+/* ── Answer key ── */
+.keygrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:8px;margin-top:14px}
+.kcell{border:1px solid var(--line);background:#fff;padding:7px 10px;font-family:var(--mono);font-size:13px;display:flex;justify-content:space-between}
+.kcell b{color:var(--navy)}
+footer{margin-top:48px;padding-top:16px;border-top:3px double var(--line);font-size:12.5px;color:#7387a0;font-family:var(--mono)}
+a{color:var(--navy)}
+@media print{details.ans{border-style:solid} details.ans .ax{display:block}}
+</style>
+</head>
+<body>
+
+<div class="hero"><div class="hero-in">
+  <div class="sheetno">Sheet 01 · Rev A &nbsp;·&nbsp; Drawn for exam prep &nbsp;·&nbsp; Scale: full difficulty</div>
+  <h1>The Architect's Drafting Book<br><em>50 Scenario Questions</em> for SAA-C03</h1>
+  <p>Original practice scenarios written to the real exam's blueprint — every distractor fails on one precise detail, the way the actual test writes them. Answers stay folded until you commit.</p>
+  <div class="titleblock">
+    <div class="tb"><b>Exam</b><span>AWS Solutions Architect — Associate (SAA-C03)</span></div>
+    <div class="tb"><b>Domain weighting</b><span>Matched: 30 / 26 / 24 / 20 %</span></div>
+    <div class="tb"><b>Format</b><span>Single-answer MCQ · self-scored</span></div>
+    <div class="tb"><b>Diagrams</b><span>10 architecture schematics</span></div>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+<nav class="toc">
+  <a class="t1" href="#d1"><b>Domain 1 · 30%</b><span>Secure Architectures — Q1–Q15</span></a>
+  <a class="t2" href="#d2"><b>Domain 2 · 26%</b><span>Resilient Architectures — Q16–Q28</span></a>
+  <a class="t3" href="#d3"><b>Domain 3 · 24%</b><span>High-Performing — Q29–Q40</span></a>
+  <a class="t4" href="#d4"><b>Domain 4 · 20%</b><span>Cost-Optimized — Q41–Q50</span></a>
+</nav>
+<p class="howto">How to use: read the scenario, commit to a letter, then open <b>Answer &amp; reasoning</b>. The "why the others fail" line is where the exam skill actually lives.</p>
+
+<!-- ══════════ DOMAIN 1 ══════════ -->
+<section class="dom d1" id="d1">
+  <div class="kicker">Domain 1 · 30% of scored content</div>
+  <h2>Design Secure Architectures</h2>
+  <p>Identity, encryption, network protection, and the eternal exam favorites: roles over keys, deny over hope.</p>
+</section>
+<div class="q d1"><div class="qh"><span class="qn">Q1</span><span class="stamp">Secure</span><span class="topic">Cross-account IAM access</span></div><div class="qb">
+<p class="sc">An external audit firm (its own AWS account) needs <b>read-only access to S3 buckets</b> in your production account for a 6-week engagement. Security requires no long-term credentials to leave your account. What should you configure?</p>
+<ol class="opts">
+<li>Create IAM users for each auditor in your account and email them access keys.</li>
+<li>Create an IAM role in your account with an S3 read-only policy and a trust policy naming the auditor's account; auditors assume the role via STS.</li>
+<li>Make the buckets public for the engagement and share the URLs.</li>
+<li>Generate one shared access key pair and rotate it weekly during the audit.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>Cross-account access is the canonical use case for an <b>IAM role assumed via STS</b>. The trust policy limits <i>who</i> can assume it, the permissions policy limits <i>what</i> they can do, credentials are temporary (auto-expiring), and every AssumeRole call lands in CloudTrail. Delete the role when the audit ends.</p>
+<p class="no"><b>A &amp; D</b> create long-lived keys — exactly what security prohibited, and keys can't be scoped by time. <b>C</b> is a data breach with extra steps.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q2</span><span class="stamp">Secure</span><span class="topic">Private S3 access — VPC endpoints</span></div><div class="qb">
+<p class="sc">EC2 instances in <b>private subnets</b> must read/write S3. Compliance mandates that traffic <b>never traverses the public internet</b> and that the bucket only accepts requests originating from this VPC. Which design meets both requirements at no additional data-processing cost?</p>
+<figure class="dg"><svg viewBox="0 0 720 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gateway VPC endpoint routing to S3">
+<defs><marker id="ar2" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 z" fill="#0b2545"/></marker></defs>
+<rect x="12" y="14" width="430" height="182" rx="8" fill="#f4f8fc" stroke="#0b2545" stroke-dasharray="6 4"/>
+<text x="26" y="36" font-family="monospace" font-size="12" fill="#0b2545" letter-spacing="2">VPC 10.0.0.0/16</text>
+<rect x="34" y="52" width="180" height="120" rx="6" fill="#fff" stroke="#6d28d9"/>
+<text x="46" y="74" font-family="monospace" font-size="11" fill="#6d28d9">PRIVATE SUBNET</text>
+<rect x="52" y="88" width="144" height="34" rx="4" fill="#f3eefe" stroke="#6d28d9"/>
+<text x="124" y="110" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#10233f">EC2 app tier</text>
+<text x="52" y="150" font-family="sans-serif" font-size="10.5" fill="#54657e">route: pl-s3 &#8594; vpce</text>
+<rect x="280" y="82" width="140" height="46" rx="6" fill="#e8f6f9" stroke="#0e7490"/>
+<text x="350" y="101" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#0b2545">Gateway VPC</text>
+<text x="350" y="117" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#0b2545">Endpoint (S3)</text>
+<line x1="196" y1="105" x2="276" y2="105" stroke="#0b2545" stroke-width="2" marker-end="url(#ar2)"/>
+<rect x="520" y="74" width="170" height="62" rx="6" fill="#eaf6ee" stroke="#15803d" stroke-width="2"/>
+<text x="605" y="99" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#0b2545" font-weight="bold">Amazon S3</text>
+<text x="605" y="117" font-family="sans-serif" font-size="10.5" text-anchor="middle" fill="#54657e">policy: aws:sourceVpce</text>
+<line x1="424" y1="105" x2="516" y2="105" stroke="#0b2545" stroke-width="2" marker-end="url(#ar2)"/>
+<text x="470" y="94" font-family="monospace" font-size="10" text-anchor="middle" fill="#15803d">AWS network</text>
+<line x1="520" y1="176" x2="620" y2="176" stroke="#b23b3b" stroke-width="2"/><line x1="540" y1="166" x2="600" y2="186" stroke="#b23b3b" stroke-width="2"/>
+<text x="530" y="164" font-family="monospace" font-size="10" fill="#b23b3b">NO IGW / NAT PATH</text>
+</svg><figcaption>Fig. Q2 — Route table entry sends S3 prefix-list traffic to the gateway endpoint; the internet is never in the path.</figcaption></figure>
+<ol class="opts">
+<li>Route S3 traffic through a NAT gateway in a public subnet.</li>
+<li>Create a Gateway VPC endpoint for S3, add it to the private route tables, and add a bucket policy condition on <b>aws:sourceVpce</b>.</li>
+<li>Create an Interface VPC endpoint for S3 in each AZ and update DNS.</li>
+<li>Attach an internet gateway and restrict the bucket by the instances' public IPs.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>Gateway endpoints</b> for S3 are free, keep traffic on the AWS network, and pair with a bucket policy <b>aws:sourceVpce / aws:sourceVpc</b> condition to lock the bucket to your VPC — both requirements, zero data-processing charges.</p>
+<p class="no"><b>A</b> stays on AWS's network but hits the public S3 endpoint and bills NAT processing per GB. <b>C</b> works but charges hourly + per-GB — the question said no additional cost. <b>D</b> puts instances on the internet, violating requirement one.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q3</span><span class="stamp">Secure</span><span class="topic">S3 encryption choice — SSE-KMS</span></div><div class="qb">
+<p class="sc">A healthcare app stores records in S3. Auditors require <b>an audit trail of every use of the encryption key</b> and the ability to <b>control and rotate the key</b> on the company's own schedule. Which encryption option satisfies this?</p>
+<ol class="opts">
+<li>SSE-S3 (Amazon-managed keys).</li>
+<li>SSE-C (customer-provided keys sent with each request).</li>
+<li>SSE-KMS with a customer managed KMS key.</li>
+<li>Client-side encryption with keys stored on the app servers.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p>Only <b>SSE-KMS with a customer managed key</b> gives you both asks: every Encrypt/Decrypt call is logged to <b>CloudTrail</b> (the audit trail), and you own the key policy, rotation schedule, and lifecycle.</p>
+<p class="no"><b>A</b> has no key-level audit trail or rotation control. <b>B</b> means you transmit and manage raw keys yourself — no CloudTrail, high operational risk. <b>D</b> shifts all key management burden onto you with no managed auditing.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q4</span><span class="stamp">Secure</span><span class="topic">Credential storage &amp; rotation</span></div><div class="qb">
+<p class="sc">Lambda functions connect to an RDS PostgreSQL database. Security mandates the DB password be <b>encrypted at rest, never in code, and rotated automatically every 30 days</b> without redeploying functions. What is the best fit?</p>
+<ol class="opts">
+<li>Store the password in Systems Manager Parameter Store as a SecureString.</li>
+<li>Store the password in AWS Secrets Manager with a 30-day rotation schedule.</li>
+<li>Store the password in an encrypted environment variable per function.</li>
+<li>Store the password in an encrypted S3 object the functions download.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>Secrets Manager</b> is purpose-built for this: KMS-encrypted storage plus <b>native automatic rotation</b> using a managed Lambda rotator for RDS — the 30-day rotation is a checkbox, and functions always fetch the current value at runtime.</p>
+<p class="no"><b>A</b> encrypts fine but has no built-in rotation — you'd build the rotator yourself. <b>C</b> requires a redeploy to rotate. <b>D</b> is DIY secret management with none of the rotation or fine-grained auditing.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q5</span><span class="stamp">Secure</span><span class="topic">Security groups vs network ACLs</span></div><div class="qb">
+<p class="sc">Your team identifies a single malicious IP address hammering EC2 instances in one subnet. You must <b>explicitly block that IP</b> at the network layer while leaving all other traffic untouched. Where do you put the rule?</p>
+<ol class="opts">
+<li>Add a deny rule for the IP to the instances' security group.</li>
+<li>Add an inbound DENY rule for the IP to the subnet's network ACL, numbered before the allow rules.</li>
+<li>Create a Route 53 rule to drop queries from the IP.</li>
+<li>Enable VPC Flow Logs to reject the traffic.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>This is the classic stateful-vs-stateless split: <b>security groups have no deny rules</b> — they are allow-lists only. <b>NACLs are stateless and support explicit DENY</b>, evaluated in rule-number order, so a low-numbered deny for that IP blocks it subnet-wide.</p>
+<p class="no"><b>A</b> is impossible by design. <b>C</b> — Route 53 resolves DNS; it doesn't filter packets. <b>D</b> — Flow Logs <i>record</i> traffic; they never block anything.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q6</span><span class="stamp">Secure</span><span class="topic">Cognito user pools vs identity pools</span></div><div class="qb">
+<p class="sc">A mobile app needs users to <b>sign up / sign in (including Google login)</b> and then <b>upload photos directly to an S3 bucket</b> with temporary, scoped AWS credentials. Which combination delivers this with the least custom code?</p>
+<ol class="opts">
+<li>A Cognito user pool for authentication, plus a Cognito identity pool to exchange the token for temporary AWS credentials.</li>
+<li>A Cognito user pool alone — its tokens grant S3 access directly.</li>
+<li>Create an IAM user per app user and embed access keys in the app.</li>
+<li>A Cognito identity pool alone handling both sign-in and credentials.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: A</span>
+<p>Two different jobs: the <b>user pool</b> is the directory — sign-up, sign-in, social federation — and issues JWTs. The <b>identity pool</b> exchanges those JWTs for <b>temporary IAM credentials</b> scoped by role, which is what S3 actually understands.</p>
+<p class="no"><b>B</b> — user-pool JWTs aren't AWS credentials; S3 can't consume them directly. <b>C</b> — an IAM user per end user is an anti-pattern and embedded keys leak. <b>D</b> — identity pools federate credentials but aren't a user directory with sign-up/sign-in UX.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q7</span><span class="stamp">Secure</span><span class="topic">AWS WAF placement</span></div><div class="qb">
+<p class="sc">A web application behind an <b>Application Load Balancer</b> is being probed with <b>SQL-injection payloads</b> in query strings. You must block these requests before they reach the app, with minimal development effort. What do you deploy?</p>
+<ol class="opts">
+<li>AWS Shield Advanced on the ALB.</li>
+<li>Amazon GuardDuty with S3 protection enabled.</li>
+<li>An AWS WAF web ACL with the managed SQL-injection rule group, associated with the ALB.</li>
+<li>Stricter NACL rules on the web subnets.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p><b>WAF inspects Layer-7 request content</b> — exactly where SQLi lives — and the AWS-managed <b>SQLi rule group</b> means no rules to write. WAF attaches natively to ALB, CloudFront, and API Gateway.</p>
+<p class="no"><b>A</b> — Shield is DDoS protection (volumetric), not payload inspection. <b>B</b> — GuardDuty <i>detects</i> threats from logs; it blocks nothing. <b>D</b> — NACLs see IPs and ports, not HTTP query strings.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q8</span><span class="stamp">Secure</span><span class="topic">Organizations SCPs</span></div><div class="qb">
+<p class="sc">A company with <b>120 AWS accounts</b> in AWS Organizations must guarantee that <b>no one — including member-account root users — can disable CloudTrail</b>. What is the enforceable control?</p>
+<ol class="opts">
+<li>Attach an identical IAM policy denying cloudtrail:StopLogging in every account.</li>
+<li>Attach a Service Control Policy denying cloudtrail:StopLogging and cloudtrail:DeleteTrail at the organization root/OU.</li>
+<li>Set IAM permission boundaries on all users and roles.</li>
+<li>Create an AWS Config rule that checks whether CloudTrail is enabled.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>SCPs are the only guardrail that constrains member-account root users.</b> One deny policy at the root or OU level applies to all 120 accounts, is centrally managed, and cannot be removed from inside a member account.</p>
+<p class="no"><b>A</b> — root ignores IAM policies, and 120 copies drift. <b>C</b> — permission boundaries apply per-principal and never to root. <b>D</b> — Config is <i>detective</i>: it reports the trail was stopped; it doesn't prevent it.</p>
+</div></details></div></div>
+<div class="q d1"><div class="qh"><span class="qn">Q9</span><span class="stamp">Secure</span><span class="topic">EC2 credentials — instance profiles</span></div><div class="qb">
+<p class="sc">An application on EC2 writes objects to S3 and items to DynamoDB. A security review flags <b>hard-coded access keys in a config file</b> on the instance. What is the recommended remediation?</p>
+<ol class="opts">
+<li>Move the keys into environment variables set at boot via user data.</li>
+<li>Encrypt the config file with KMS and decrypt it at startup.</li>
+<li>Attach an IAM role to the instance (instance profile) with least-privilege S3/DynamoDB permissions and delete the keys.</li>
+<li>Rotate the access keys every 24 hours with a cron job.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p><b>Instance profiles</b> deliver short-lived credentials through the instance metadata service; the SDKs pick them up automatically, they rotate themselves, and nothing sensitive sits on disk. This is the AWS-stated best practice for compute workloads.</p>
+<p class="no"><b>A</b> — user data is readable via the metadata/describe APIs; still static keys. <b>B</b> — an encrypted static key is still a static key with a new decryption problem. <b>D</b> — rapid rotation reduces exposure but keeps the fundamental anti-pattern alive.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q10</span><span class="stamp">Secure</span><span class="topic">AWS Config vs CloudTrail</span></div><div class="qb">
+<p class="sc">Compliance needs to <b>continuously record the configuration state of resources</b> (e.g., "was this security group ever open to 0.0.0.0/0, and when?") and <b>auto-flag violations</b> against internal rules. Which service is the foundation?</p>
+<ol class="opts">
+<li>AWS CloudTrail with log file validation.</li>
+<li>AWS Config with configuration recorder and Config rules.</li>
+<li>AWS Trusted Advisor security checks.</li>
+<li>Amazon Inspector continuous scanning.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>Config</b> is the "state and time machine": it snapshots each resource's configuration, keeps the change history, and evaluates <b>Config rules</b> (managed or custom) for compliance, with auto-remediation hooks.</p>
+<p class="no"><b>A</b> — CloudTrail answers <i>who called which API</i>, not <i>what state a resource is in now</i> or whether that state is compliant. <b>C</b> — a fixed best-practice checklist, not your custom rules or history. <b>D</b> — Inspector finds software vulnerabilities on workloads, not resource-configuration drift.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q11</span><span class="stamp">Secure</span><span class="topic">Macie vs GuardDuty vs Inspector</span></div><div class="qb">
+<p class="sc">Legal suspects that S3 buckets across the account contain <b>unprotected personally identifiable information (PII)</b> — names, card numbers, credentials. You need a managed service to <b>discover and classify this sensitive data at scale</b>. Which one?</p>
+<ol class="opts">
+<li>Amazon GuardDuty</li>
+<li>Amazon Inspector</li>
+<li>Amazon Macie</li>
+<li>Amazon Detective</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p><b>Macie</b> is the data-security service: it uses ML and pattern matching to find and classify <b>sensitive data in S3</b> — PII, financial data, credentials — and reports where it lives and whether the bucket is exposed.</p>
+<p class="no">Memorize the trio: <b>GuardDuty</b> = threat <i>detection</i> from logs (accounts/network), <b>Inspector</b> = <i>vulnerabilities</i> in EC2/ECR/Lambda workloads, <b>Macie</b> = sensitive <i>data</i> in S3. <b>Detective</b> investigates findings after the fact.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q12</span><span class="stamp">Secure</span><span class="topic">Encrypting an existing EBS volume</span></div><div class="qb">
+<p class="sc">An audit finds a production EC2 instance running on an <b>unencrypted EBS volume</b>. You must produce an encrypted volume containing the same data. What is the correct procedure?</p>
+<ol class="opts">
+<li>Open the volume settings and toggle encryption on.</li>
+<li>Snapshot the volume, copy the snapshot with encryption enabled, create a new volume from the encrypted copy, and swap it onto the instance.</li>
+<li>Enable "EBS encryption by default" in the region — existing volumes encrypt automatically.</li>
+<li>Attach the volume to KMS directly via a grant.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>Encryption <b>cannot be switched on for an existing volume</b>. The supported path is snapshot → <b>copy the snapshot with encryption</b> (choose your KMS key) → create the encrypted volume → detach/attach swap. Same data, now encrypted.</p>
+<p class="no"><b>A</b> — no such toggle exists. <b>C</b> — "encryption by default" affects only <i>newly created</i> volumes/snapshots. <b>D</b> — grants authorize key <i>use</i>; they don't retroactively encrypt storage.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q13</span><span class="stamp">Secure</span><span class="topic">Session Manager over bastions</span></div><div class="qb">
+<p class="sc">Admins need shell access to EC2 instances in private subnets. Security wants <b>zero inbound ports open, no SSH key management, and every session logged</b> for audit. What is the best solution?</p>
+<ol class="opts">
+<li>A hardened bastion host in a public subnet with SSH key rotation.</li>
+<li>AWS Systems Manager Session Manager with the SSM agent and an instance role, logging sessions to CloudWatch/S3.</li>
+<li>A site-to-site VPN plus direct SSH to each instance.</li>
+<li>EC2 Instance Connect through an internet gateway.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>Session Manager</b> checks every box: the agent makes <i>outbound</i> connections only (no inbound rules at all), access is governed by IAM instead of SSH keys, and full session transcripts stream to CloudWatch Logs or S3.</p>
+<p class="no"><b>A</b> — a bastion is an exposed host with open port 22 and keys to manage: exactly what was prohibited. <b>C</b> — still SSH keys and open instance ports inside the network. <b>D</b> — requires reachable instances and port 22; wrong for private subnets with zero inbound.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q14</span><span class="stamp">Secure</span><span class="topic">ACM + CloudFront region rule</span></div><div class="qb">
+<p class="sc">You are adding HTTPS with a custom domain (www.example.com) to a <b>CloudFront distribution</b>. Certificates must renew automatically at no cost. What do you do?</p>
+<ol class="opts">
+<li>Request a public ACM certificate in us-east-1 and attach it to the distribution.</li>
+<li>Request a public ACM certificate in the region closest to most users.</li>
+<li>Buy a certificate from a third-party CA and install it on the origin EC2 instances only.</li>
+<li>Use a self-signed certificate on the distribution.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: A</span>
+<p>Two exam facts in one: <b>ACM public certs are free and auto-renew</b>, and for CloudFront the certificate <b>must live in us-east-1 (N. Virginia)</b> because CloudFront is a global service anchored there.</p>
+<p class="no"><b>B</b> — any other region's cert simply won't appear in the CloudFront dropdown. <b>C</b> — securing only the origin leaves the viewer connection without your domain's cert (and adds renewal toil). <b>D</b> — browsers reject self-signed certs; CloudFront won't serve your domain with one.</p>
+</div></details></div></div>
+
+<div class="q d1"><div class="qh"><span class="qn">Q15</span><span class="stamp">Secure</span><span class="topic">Third-party access — external ID</span></div><div class="qb">
+<p class="sc">A SaaS monitoring vendor needs read access to CloudWatch in your account. AWS best practice for granting a <b>third party</b> cross-account access — while preventing the <b>confused-deputy problem</b> — is to:</p>
+<ol class="opts">
+<li>Create an IAM user for the vendor and share its access keys.</li>
+<li>Create a cross-account IAM role trusting the vendor's account, requiring a unique sts:ExternalId condition the vendor supplies on AssumeRole.</li>
+<li>Share your account's root credentials under NDA.</li>
+<li>Create a role trusting the vendor's account with no conditions — simpler is safer.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>The <b>external ID</b> is a shared secret in the trust policy's condition. Because the vendor must pass <i>your</i> unique ID when assuming the role, another customer of that vendor can't trick the vendor into using its access against your account — the confused-deputy defense.</p>
+<p class="no"><b>A</b> — long-lived keys held by an outsider. <b>C</b> — never leaves the building; root is unshareable, full stop. <b>D</b> — without the external ID condition, the role is exactly what the confused-deputy attack exploits.</p>
+</div></details></div></div>
+
+<!-- ══════════ DOMAIN 2 ══════════ -->
+<section class="dom d2" id="d2">
+  <div class="kicker">Domain 2 · 26% of scored content</div>
+  <h2>Design Resilient Architectures</h2>
+  <p>Multi-AZ by default, decouple everything, and know your RTO/RPO ladder cold.</p>
+</section>
+
+<div class="q d2"><div class="qh"><span class="qn">Q16</span><span class="stamp">Resilient</span><span class="topic">Multi-AZ web tier</span></div><div class="qb">
+<p class="sc">A web app runs on <b>one EC2 instance in one AZ</b> behind nothing. After an AZ outage took it down, you must redesign for <b>high availability with automatic recovery</b> and no manual intervention. What is the minimal correct architecture?</p>
+<figure class="dg"><svg viewBox="0 0 720 230" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ALB with Auto Scaling group across two AZs">
+<defs><marker id="ar16" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 z" fill="#0b2545"/></marker></defs>
+<rect x="300" y="16" width="120" height="42" rx="6" fill="#e8f6f9" stroke="#0e7490" stroke-width="2"/>
+<text x="360" y="42" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#0b2545" font-weight="bold">ALB</text>
+<text x="360" y="12" font-family="monospace" font-size="10" text-anchor="middle" fill="#54657e">users &#8595;</text>
+<rect x="60" y="100" width="270" height="112" rx="8" fill="#f4f8fc" stroke="#0e7490" stroke-dasharray="6 4"/>
+<text x="76" y="122" font-family="monospace" font-size="11" fill="#0e7490">AVAILABILITY ZONE A</text>
+<rect x="90" y="138" width="90" height="34" rx="4" fill="#fff" stroke="#0b2545"/>
+<text x="135" y="160" font-family="sans-serif" font-size="11.5" text-anchor="middle">EC2</text>
+<rect x="200" y="138" width="90" height="34" rx="4" fill="#fff" stroke="#0b2545"/>
+<text x="245" y="160" font-family="sans-serif" font-size="11.5" text-anchor="middle">EC2</text>
+<rect x="390" y="100" width="270" height="112" rx="8" fill="#f4f8fc" stroke="#0e7490" stroke-dasharray="6 4"/>
+<text x="406" y="122" font-family="monospace" font-size="11" fill="#0e7490">AVAILABILITY ZONE B</text>
+<rect x="420" y="138" width="90" height="34" rx="4" fill="#fff" stroke="#0b2545"/>
+<text x="465" y="160" font-family="sans-serif" font-size="11.5" text-anchor="middle">EC2</text>
+<rect x="530" y="138" width="90" height="34" rx="4" fill="#fff" stroke="#0b2545"/>
+<text x="575" y="160" font-family="sans-serif" font-size="11.5" text-anchor="middle">EC2</text>
+<line x1="330" y1="58" x2="190" y2="134" stroke="#0b2545" stroke-width="1.8" marker-end="url(#ar16)"/>
+<line x1="390" y1="58" x2="530" y2="134" stroke="#0b2545" stroke-width="1.8" marker-end="url(#ar16)"/>
+<rect x="222" y="188" width="276" height="30" rx="15" fill="#eaf6ee" stroke="#15803d"/>
+<text x="360" y="208" font-family="monospace" font-size="11" text-anchor="middle" fill="#15803d">AUTO SCALING GROUP · min 2 · health checks</text>
+</svg><figcaption>Fig. Q16 — Load balancer spreads traffic; the ASG replaces failed instances and spans AZs.</figcaption></figure>
+<ol class="opts">
+<li>Resize to the largest instance type available.</li>
+<li>An Application Load Balancer targeting an Auto Scaling group with minimum 2 instances spread across at least two AZs.</li>
+<li>Two instances in the same AZ behind an ALB.</li>
+<li>Route 53 weighted records pointing at two standalone instances.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>HA on the exam = <b>redundancy across AZs + health-checked routing + self-healing</b>. The ALB stops sending to unhealthy targets; the ASG detects the failure and launches replacements — including into the surviving AZ.</p>
+<p class="no"><b>A</b> — vertical scaling keeps a single point of failure. <b>C</b> — the original outage was the AZ itself; same-AZ redundancy dies together. <b>D</b> — DNS TTL caching makes failover slow, and nothing replaces the dead instance.</p>
+</div></details></div></div>
+<div class="q d2"><div class="qh"><span class="qn">Q17</span><span class="stamp">Resilient</span><span class="topic">RDS Multi-AZ vs read replica</span></div><div class="qb">
+<p class="sc">A single-AZ RDS MySQL database backs a payments app. The requirement: <b>survive an AZ failure with automatic failover and no data loss</b>, keeping the same connection endpoint. Read traffic is modest. What do you enable?</p>
+<figure class="dg"><svg viewBox="0 0 720 235" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="RDS Multi-AZ versus read replica comparison">
+<defs><marker id="ar17" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 z" fill="#0b2545"/></marker></defs>
+<rect x="16" y="16" width="336" height="200" rx="8" fill="#fff" stroke="#0e7490" stroke-width="2"/>
+<text x="184" y="40" font-family="monospace" font-size="12" text-anchor="middle" fill="#0e7490" font-weight="bold">MULTI-AZ — for AVAILABILITY</text>
+<rect x="48" y="66" width="110" height="42" rx="5" fill="#e8f6f9" stroke="#0b2545"/>
+<text x="103" y="86" font-family="sans-serif" font-size="11.5" text-anchor="middle">Primary</text><text x="103" y="100" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">AZ-a</text>
+<rect x="212" y="66" width="110" height="42" rx="5" fill="#f4f8fc" stroke="#0b2545" stroke-dasharray="5 3"/>
+<text x="267" y="86" font-family="sans-serif" font-size="11.5" text-anchor="middle">Standby</text><text x="267" y="100" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">AZ-b</text>
+<line x1="158" y1="87" x2="208" y2="87" stroke="#0b2545" stroke-width="2" marker-end="url(#ar17)"/>
+<text x="184" y="79" font-family="monospace" font-size="9" text-anchor="middle" fill="#15803d">SYNC</text>
+<text x="184" y="140" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#10233f">auto failover, same endpoint</text>
+<text x="184" y="158" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#10233f">standby serves no reads</text>
+<text x="184" y="184" font-family="monospace" font-size="10.5" text-anchor="middle" fill="#15803d">RPO &#8776; 0 · RTO &#8776; 1–2 min</text>
+<rect x="368" y="16" width="336" height="200" rx="8" fill="#fff" stroke="#c2410c" stroke-width="2"/>
+<text x="536" y="40" font-family="monospace" font-size="12" text-anchor="middle" fill="#c2410c" font-weight="bold">READ REPLICA — for SCALING</text>
+<rect x="400" y="66" width="110" height="42" rx="5" fill="#fdf0e7" stroke="#0b2545"/>
+<text x="455" y="86" font-family="sans-serif" font-size="11.5" text-anchor="middle">Primary</text>
+<rect x="564" y="66" width="110" height="42" rx="5" fill="#fff" stroke="#0b2545"/>
+<text x="619" y="86" font-family="sans-serif" font-size="11.5" text-anchor="middle">Replica</text><text x="619" y="100" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">own endpoint</text>
+<line x1="510" y1="87" x2="560" y2="87" stroke="#0b2545" stroke-width="2" marker-end="url(#ar17)"/>
+<text x="536" y="79" font-family="monospace" font-size="9" text-anchor="middle" fill="#c2410c">ASYNC</text>
+<text x="536" y="140" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#10233f">serves read traffic</text>
+<text x="536" y="158" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#10233f">failover = manual promotion</text>
+<text x="536" y="184" font-family="monospace" font-size="10.5" text-anchor="middle" fill="#c2410c">replication lag &#8594; RPO &gt; 0</text>
+</svg><figcaption>Fig. Q17 — The exam's favorite pairing: synchronous standby for uptime vs asynchronous replica for reads.</figcaption></figure>
+<ol class="opts">
+<li>Add a read replica in another AZ and promote it if the primary fails.</li>
+<li>Convert the instance to a Multi-AZ deployment.</li>
+<li>Take automated snapshots every 5 minutes.</li>
+<li>Add a read replica in another region.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>Multi-AZ</b> replicates <b>synchronously</b> to a standby in another AZ and fails over <b>automatically</b> behind the same DNS endpoint — which is precisely "no data loss, no manual steps, same endpoint."</p>
+<p class="no"><b>A &amp; D</b> — replicas are <b>asynchronous</b> (possible data loss) and promotion is a manual, endpoint-changing event. <b>C</b> — restoring a snapshot means minutes-to-hours of RTO and up to 5 minutes of lost writes.</p>
+</div></details></div></div>
+
+<div class="q d2"><div class="qh"><span class="qn">Q18</span><span class="stamp">Resilient</span><span class="topic">Decoupling with SQS</span></div><div class="qb">
+<p class="sc">An e-commerce checkout writes orders synchronously to a processing tier. During flash sales, the processing tier is overwhelmed and <b>orders are lost</b>. You must ensure <b>no order is ever dropped</b> and the processing tier can work at its own pace. What is the fix?</p>
+<figure class="dg"><svg viewBox="0 0 720 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SQS queue decoupling web tier from processing tier">
+<defs><marker id="ar18" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 z" fill="#0b2545"/></marker></defs>
+<rect x="20" y="46" width="150" height="52" rx="6" fill="#fff" stroke="#0b2545" stroke-width="2"/>
+<text x="95" y="68" font-family="sans-serif" font-size="12.5" text-anchor="middle" font-weight="bold">Web tier</text>
+<text x="95" y="86" font-family="monospace" font-size="10" text-anchor="middle" fill="#54657e">spiky producers</text>
+<rect x="272" y="40" width="176" height="64" rx="8" fill="#e8f6f9" stroke="#0e7490" stroke-width="2"/>
+<text x="360" y="64" font-family="sans-serif" font-size="12.5" text-anchor="middle" font-weight="bold" fill="#0b2545">SQS queue</text>
+<text x="360" y="82" font-family="monospace" font-size="10" text-anchor="middle" fill="#0e7490">durable buffer</text>
+<rect x="550" y="46" width="150" height="52" rx="6" fill="#fff" stroke="#0b2545" stroke-width="2"/>
+<text x="625" y="68" font-family="sans-serif" font-size="12.5" text-anchor="middle" font-weight="bold">Workers (ASG)</text>
+<text x="625" y="86" font-family="monospace" font-size="10" text-anchor="middle" fill="#54657e">poll at own pace</text>
+<line x1="170" y1="72" x2="268" y2="72" stroke="#0b2545" stroke-width="2" marker-end="url(#ar18)"/>
+<text x="219" y="62" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">send</text>
+<line x1="448" y1="72" x2="546" y2="72" stroke="#0b2545" stroke-width="2" marker-end="url(#ar18)"/>
+<text x="497" y="62" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">poll + delete</text>
+<text x="360" y="132" font-family="monospace" font-size="10.5" text-anchor="middle" fill="#15803d">scale workers on ApproximateNumberOfMessagesVisible</text>
+</svg><figcaption>Fig. Q18 — The queue absorbs the spike; the failure mode changes from "dropped" to "delayed."</figcaption></figure>
+<ol class="opts">
+<li>Vertically scale the processing tier's database.</li>
+<li>Publish orders to an SNS topic that invokes the processors directly.</li>
+<li>Place an SQS queue between the tiers; workers in an Auto Scaling group poll it, scaling on queue depth.</li>
+<li>Increase the web tier's retry count and timeout.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p>A <b>durable queue converts a synchronous dependency into an asynchronous buffer</b>: bursts pile up safely in SQS (messages persist until deleted), and workers consume at sustainable speed — even auto-scaling on <b>queue depth</b>.</p>
+<p class="no"><b>A</b> — the bottleneck is coupling, not DB size; the next bigger spike loses orders again. <b>B</b> — SNS push delivery still hammers a struggling consumer in real time; no pull-paced buffer. <b>D</b> — retries amplify load during the spike, making the collapse worse.</p>
+</div></details></div></div>
+
+<div class="q d2"><div class="qh"><span class="qn">Q19</span><span class="stamp">Resilient</span><span class="topic">Route 53 failover routing</span></div><div class="qb">
+<p class="sc">A primary web stack runs in us-east-1. If it becomes unhealthy, users should <b>automatically</b> be served a static "status" page hosted on S3 + CloudFront. Which Route 53 configuration achieves this?</p>
+<figure class="dg"><svg viewBox="0 0 720 170" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Route 53 failover routing with health check">
+<defs><marker id="ar19" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 z" fill="#0b2545"/></marker></defs>
+<rect x="290" y="14" width="140" height="46" rx="6" fill="#e8f6f9" stroke="#0e7490" stroke-width="2"/>
+<text x="360" y="34" font-family="sans-serif" font-size="12.5" text-anchor="middle" font-weight="bold" fill="#0b2545">Route 53</text>
+<text x="360" y="50" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#0e7490">failover policy</text>
+<rect x="60" y="104" width="230" height="50" rx="6" fill="#fff" stroke="#15803d" stroke-width="2"/>
+<text x="175" y="126" font-family="sans-serif" font-size="12" text-anchor="middle" font-weight="bold">PRIMARY · ALB us-east-1</text>
+<text x="175" y="143" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#15803d">health check attached &#10003;</text>
+<rect x="440" y="104" width="230" height="50" rx="6" fill="#fff" stroke="#0b2545" stroke-dasharray="5 3"/>
+<text x="555" y="126" font-family="sans-serif" font-size="12" text-anchor="middle" font-weight="bold">SECONDARY · S3/CloudFront</text>
+<text x="555" y="143" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">static status page</text>
+<line x1="322" y1="60" x2="200" y2="100" stroke="#15803d" stroke-width="2" marker-end="url(#ar19)"/>
+<text x="230" y="76" font-family="monospace" font-size="9.5" fill="#15803d">healthy</text>
+<line x1="400" y1="60" x2="528" y2="100" stroke="#b23b3b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar19)"/>
+<text x="486" y="76" font-family="monospace" font-size="9.5" fill="#b23b3b">on failure</text>
+</svg><figcaption>Fig. Q19 — DNS answers flip to the secondary record only when the primary's health check fails.</figcaption></figure>
+<ol class="opts">
+<li>Weighted routing: 90% primary, 10% S3 page.</li>
+<li>Latency-based routing between the two endpoints.</li>
+<li>Failover routing: primary record with a health check, secondary record pointing at the static site.</li>
+<li>Geolocation routing with a default record for the S3 page.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p><b>Failover routing</b> is the active-passive policy: Route 53 serves the primary while its <b>health check</b> passes and flips to the secondary when it fails. The others distribute traffic among <i>healthy</i> endpoints — a different job.</p>
+<p class="no"><b>A</b> sends 10% of users to the status page all the time. <b>B</b> optimizes latency, not availability, and would route to the "closer" endpoint constantly. <b>D</b> routes by user location — unrelated to failure state.</p>
+</div></details></div></div>
+
+<div class="q d2"><div class="qh"><span class="qn">Q20</span><span class="stamp">Resilient</span><span class="topic">Aurora Global Database DR</span></div><div class="qb">
+<p class="sc">A relational trading platform needs cross-region disaster recovery with <b>RPO of about 1 second and RTO under a couple of minutes</b>, while keeping the day-to-day database MySQL-compatible. Which option meets these targets?</p>
+<ol class="opts">
+<li>Nightly RDS snapshot copies to the DR region.</li>
+<li>An RDS MySQL cross-region read replica to promote during disaster.</li>
+<li>Aurora Global Database with a secondary region promoted on failover.</li>
+<li>DynamoDB global tables.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p><b>Aurora Global Database</b> replicates at the storage layer with <b>typical lag under a second (RPO ≈ 1s)</b> and promotes a secondary region <b>in about a minute (RTO)</b> — the only relational option here that hits both numbers.</p>
+<p class="no"><b>A</b> — RPO of up to 24 hours. <b>B</b> — binlog replication lags variably and promotion of a large MySQL replica can take many minutes. <b>D</b> — meets the numbers but isn't relational/MySQL-compatible, failing the stated constraint.</p>
+</div></details></div></div>
+
+<div class="q d2"><div class="qh"><span class="qn">Q21</span><span class="stamp">Resilient</span><span class="topic">S3 Cross-Region Replication</span></div><div class="qb">
+<p class="sc">Regulation requires every object written to a compliance bucket in eu-west-1 to <b>also exist, automatically, in a bucket in eu-central-1</b>, including future writes, with different ownership possible per region. What do you configure?</p>
+<ol class="opts">
+<li>An S3 lifecycle rule transitioning objects to eu-central-1.</li>
+<li>S3 Cross-Region Replication with versioning enabled on both buckets.</li>
+<li>A nightly cron job running a sync command.</li>
+<li>S3 Transfer Acceleration on the source bucket.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>CRR</b> is the managed, automatic answer: new objects replicate asynchronously to the destination region, ownership can be remapped, and the prerequisite to remember for the exam is <b>versioning on both buckets</b>.</p>
+<p class="no"><b>A</b> — lifecycle rules move objects between <i>storage classes</i>, never between regions. <b>C</b> — a nightly sync means up to 24h of exposure and a script you must babysit. <b>D</b> — acceleration speeds <i>uploads to</i> a bucket; it copies nothing anywhere.</p>
+</div></details></div></div>
+
+<div class="q d2"><div class="qh"><span class="qn">Q22</span><span class="stamp">Resilient</span><span class="topic">DR strategy selection</span></div><div class="qb">
+<p class="sc">Management sets a disaster-recovery target of <b>RTO in the low minutes</b> for a business-critical app, but wants to <b>avoid paying for a full-capacity duplicate</b> of production. Which DR strategy fits?</p>
+<figure class="dg"><svg viewBox="0 0 720 190" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Disaster recovery strategy spectrum">
+<line x1="40" y1="150" x2="690" y2="150" stroke="#0b2545" stroke-width="2"/>
+<text x="40" y="176" font-family="monospace" font-size="10" fill="#54657e">RTO: hours</text>
+<text x="690" y="176" font-family="monospace" font-size="10" text-anchor="end" fill="#54657e">RTO: ~zero · cost: max</text>
+<rect x="46" y="52" width="140" height="72" rx="6" fill="#fff" stroke="#0b2545"/>
+<text x="116" y="76" font-family="sans-serif" font-size="11.5" text-anchor="middle" font-weight="bold">Backup &amp; restore</text>
+<text x="116" y="94" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">hours · cheapest</text>
+<rect x="212" y="52" width="140" height="72" rx="6" fill="#fff" stroke="#0b2545"/>
+<text x="282" y="76" font-family="sans-serif" font-size="11.5" text-anchor="middle" font-weight="bold">Pilot light</text>
+<text x="282" y="94" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">tens of minutes</text>
+<text x="282" y="110" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">core off, data live</text>
+<rect x="378" y="40" width="140" height="84" rx="6" fill="#e8f6f9" stroke="#0e7490" stroke-width="3"/>
+<text x="448" y="66" font-family="sans-serif" font-size="12" text-anchor="middle" font-weight="bold" fill="#0b2545">Warm standby</text>
+<text x="448" y="84" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#0e7490">minutes</text>
+<text x="448" y="100" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#0e7490">scaled-down copy ON</text>
+<text x="448" y="116" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#15803d">&#9668; THIS SCENARIO</text>
+<rect x="544" y="52" width="140" height="72" rx="6" fill="#fff" stroke="#0b2545"/>
+<text x="614" y="76" font-family="sans-serif" font-size="11.5" text-anchor="middle" font-weight="bold">Multi-site active</text>
+<text x="614" y="94" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">near-zero · full cost</text>
+</svg><figcaption>Fig. Q22 — The RTO/cost ladder from the AWS DR whitepaper; pick the leftmost rung that still meets the RTO.</figcaption></figure>
+<ol class="opts">
+<li>Backup and restore.</li>
+<li>Pilot light.</li>
+<li>Warm standby.</li>
+<li>Multi-site active-active.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p><b>Warm standby</b> keeps a <b>scaled-down but fully functional copy running</b> in the DR region; recovery is "scale it up + flip traffic," landing RTO in minutes at a fraction of full duplication cost.</p>
+<p class="no"><b>A</b> recovers in hours. <b>B</b> — pilot light keeps data replicated but core services <i>off</i>; provisioning them pushes RTO to tens of minutes. <b>D</b> meets the RTO but is exactly the full-capacity duplicate management refused to pay for.</p>
+</div></details></div></div>
+
+<div class="q d2"><div class="qh"><span class="qn">Q23</span><span class="stamp">Resilient</span><span class="topic">Shared storage — EFS</span></div><div class="qb">
+<p class="sc">A CMS runs on Linux EC2 instances in an Auto Scaling group <b>across three AZs</b>. All instances must read and write the <b>same POSIX file system</b> concurrently, and storage must grow automatically. Which service?</p>
+<ol class="opts">
+<li>A large gp3 EBS volume attached to all instances.</li>
+<li>Amazon EFS mounted on every instance via mount targets in each AZ.</li>
+<li>Instance store volumes synced with rsync.</li>
+<li>An S3 bucket mounted as the primary POSIX file system.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>EFS</b> is the managed NFS answer: concurrent multi-instance, <b>multi-AZ</b> access, POSIX semantics, and elastic capacity with no provisioning.</p>
+<p class="no"><b>A</b> — EBS is a single-AZ block device; even Multi-Attach is same-AZ and needs a cluster-aware file system. <b>C</b> — instance store is ephemeral and syncing three AZs by hand is a consistency nightmare. <b>D</b> — S3 is object storage; mounts exist but it isn't a true POSIX file system for concurrent writes.</p>
+</div></details></div></div>
+
+<div class="q d2"><div class="qh"><span class="qn">Q24</span><span class="stamp">Resilient</span><span class="topic">Kinesis vs SQS</span></div><div class="qb">
+<p class="sc">A clickstream platform needs ingestion where <b>multiple independent consumer apps read the same records</b>, records can be <b>replayed for 7 days</b>, and <b>per-user ordering</b> is preserved. Which service fits?</p>
+<ol class="opts">
+<li>SQS standard queue.</li>
+<li>SQS FIFO queue.</li>
+<li>Kinesis Data Streams with user ID as partition key.</li>
+<li>SNS topic with email subscriptions.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p>Three tells point at <b>Kinesis Data Streams</b>: <b>multiple consumers</b> reading the same data (a queue delivers each message once, to one consumer), <b>replay</b> (Kinesis retains data 24h–365 days; SQS deletes on consume), and <b>ordering per key</b> (partition key → shard order).</p>
+<p class="no"><b>A</b> — no ordering, no replay, competing consumers. <b>B</b> — ordered, but still consume-and-delete with no replay or fan-out reads. <b>D</b> — pub/sub push with no retention or replay.</p>
+</div></details></div></div>
+
+<div class="q d2"><div class="qh"><span class="qn">Q25</span><span class="stamp">Resilient</span><span class="topic">Lambda failure handling</span></div><div class="qb">
+<p class="sc">A Lambda function processes events <b>asynchronously</b>. Occasionally events fail after all automatic retries. The team must <b>capture every failed event for later analysis and reprocessing</b>. What do you configure?</p>
+<ol class="opts">
+<li>Increase the function timeout to 15 minutes.</li>
+<li>A dead-letter queue (SQS) or an on-failure destination for the function's async invocations.</li>
+<li>Write a try/catch that logs errors to CloudWatch.</li>
+<li>Set reserved concurrency to 1 so events process in order.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>For async invokes, Lambda retries twice; after that the event is <b>discarded unless a DLQ or on-failure destination</b> is set. Routing failures to SQS preserves the <b>full event payload</b> durably for inspection and replay.</p>
+<p class="no"><b>A</b> — timeouts don't rescue events that fail for other reasons, and exhausted retries still vanish. <b>C</b> — a log line isn't a re-drivable message; you lose the payload's durability guarantees. <b>D</b> — concurrency shaping doesn't capture anything.</p>
+</div></details></div></div>
+<div class="q d2"><div class="qh"><span class="qn">Q26</span><span class="stamp">Resilient</span><span class="topic">ElastiCache engine choice</span></div><div class="qb">
+<p class="sc">A gaming backend needs an <b>in-memory store for sessions and a sorted-set leaderboard</b>, with sub-millisecond reads, <b>replication across AZs, and automatic failover</b> if the primary node dies. Which configuration?</p>
+<ol class="opts">
+<li>ElastiCache for Memcached with multiple nodes.</li>
+<li>ElastiCache for Redis with cluster-mode replication group, Multi-AZ, and automatic failover.</li>
+<li>A single ElastiCache Redis node with daily backups.</li>
+<li>An RDS MySQL Multi-AZ instance with a sessions table.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>The feature list is a <b>Redis</b> fingerprint: <b>sorted sets</b> (leaderboards), <b>replication + Multi-AZ + auto-failover</b>, persistence options. Memcached is simpler by design and has none of these.</p>
+<p class="no"><b>A</b> — Memcached offers no replication, failover, or advanced data types; node loss = data loss. <b>C</b> — a single node is the opposite of failover; a backup restores minutes-old data. <b>D</b> — a relational DB delivers millisecond-plus latency and no in-memory data structures.</p>
+</div></details></div></div>
+
+<div class="q d2"><div class="qh"><span class="qn">Q27</span><span class="stamp">Resilient</span><span class="topic">Storage Gateway hybrid backup</span></div><div class="qb">
+<p class="sc">An on-premises data center must back up file shares to AWS while apps keep using an <b>NFS mount</b>, with <b>recently used files cached locally</b> for low latency and everything durably stored as S3 objects. Which service?</p>
+<ol class="opts">
+<li>AWS DataSync running weekly transfer tasks.</li>
+<li>AWS Storage Gateway — S3 File Gateway.</li>
+<li>AWS Snowball Edge appliances rotated monthly.</li>
+<li>Direct S3 API integration in every application.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>S3 File Gateway</b> is a hybrid bridge: apps see a standard <b>NFS/SMB share</b>, the gateway keeps a <b>local cache of hot data</b>, and files land in S3 as native objects — continuous, transparent, no app changes.</p>
+<p class="no"><b>A</b> — DataSync is a transfer engine for migrations/scheduled copies; it presents no ongoing file mount or cache. <b>C</b> — Snowball is offline bulk transport, not a continuous backup path. <b>D</b> — rewriting every app to speak S3 is maximal operational effort, the opposite of the ask.</p>
+</div></details></div></div>
+
+<div class="q d2"><div class="qh"><span class="qn">Q28</span><span class="stamp">Resilient</span><span class="topic">DynamoDB global tables</span></div><div class="qb">
+<p class="sc">A global key-value session service must be <b>active-active in three regions</b>: users read <b>and write</b> locally with single-digit-millisecond latency, and data converges automatically across regions. Which datastore?</p>
+<ol class="opts">
+<li>Aurora Global Database.</li>
+<li>DynamoDB global tables.</li>
+<li>RDS MySQL with cross-region read replicas.</li>
+<li>ElastiCache Redis replicated by an application-level process.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>Global tables</b> are multi-region, <b>multi-writer</b> replicas of a DynamoDB table with automatic, last-writer-wins convergence — the managed answer for active-active key-value at millisecond latency.</p>
+<p class="no"><b>A &amp; C</b> — one writable primary region; other regions are read-only until failover, so "write locally everywhere" fails. <b>D</b> — hand-rolled cross-region cache replication is fragile and unmanaged; the exam always prefers the managed capability.</p>
+</div></details></div></div>
+
+<!-- ══════════ DOMAIN 3 ══════════ -->
+<section class="dom d3" id="d3">
+  <div class="kicker">Domain 3 · 24% of scored content</div>
+  <h2>Design High-Performing Architectures</h2>
+  <p>Cache close to users, pick storage by access pattern, and match the database engine to the query shape.</p>
+</section>
+
+<div class="q d3"><div class="qh"><span class="qn">Q29</span><span class="stamp">Performance</span><span class="topic">CloudFront + S3 global delivery</span></div><div class="qb">
+<p class="sc">Users in Asia and South America report <b>slow load times for images and video</b> stored in an S3 bucket in us-east-1. You must cut global latency <b>without duplicating the data</b> or changing the application. What do you add?</p>
+<figure class="dg"><svg viewBox="0 0 720 165" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="CloudFront edge caching in front of S3 origin">
+<defs><marker id="ar29" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 z" fill="#0b2545"/></marker></defs>
+<rect x="24" y="24" width="120" height="40" rx="6" fill="#fff" stroke="#0b2545"/><text x="84" y="49" font-family="sans-serif" font-size="11.5" text-anchor="middle">Users · Tokyo</text>
+<rect x="24" y="100" width="120" height="40" rx="6" fill="#fff" stroke="#0b2545"/><text x="84" y="125" font-family="sans-serif" font-size="11.5" text-anchor="middle">Users · S&#227;o Paulo</text>
+<rect x="222" y="24" width="150" height="40" rx="6" fill="#fdf0e7" stroke="#c2410c" stroke-width="2"/><text x="297" y="49" font-family="sans-serif" font-size="11.5" text-anchor="middle" fill="#0b2545">Edge · NRT</text>
+<rect x="222" y="100" width="150" height="40" rx="6" fill="#fdf0e7" stroke="#c2410c" stroke-width="2"/><text x="297" y="125" font-family="sans-serif" font-size="11.5" text-anchor="middle" fill="#0b2545">Edge · GRU</text>
+<line x1="144" y1="44" x2="218" y2="44" stroke="#0b2545" stroke-width="1.8" marker-end="url(#ar29)"/>
+<line x1="144" y1="120" x2="218" y2="120" stroke="#0b2545" stroke-width="1.8" marker-end="url(#ar29)"/>
+<text x="181" y="36" font-family="monospace" font-size="9" text-anchor="middle" fill="#15803d">~ms hit</text>
+<rect x="520" y="58" width="176" height="50" rx="6" fill="#eaf6ee" stroke="#15803d" stroke-width="2"/>
+<text x="608" y="80" font-family="sans-serif" font-size="12.5" text-anchor="middle" font-weight="bold" fill="#0b2545">S3 origin</text>
+<text x="608" y="97" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">us-east-1 · one copy</text>
+<line x1="372" y1="44" x2="516" y2="72" stroke="#54657e" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ar29)"/>
+<line x1="372" y1="120" x2="516" y2="94" stroke="#54657e" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ar29)"/>
+<text x="444" y="150" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">fetch only on cache miss</text>
+</svg><figcaption>Fig. Q29 — One origin, 400+ edges: distance to the user shrinks, origin load and egress cost shrink with it.</figcaption></figure>
+<ol class="opts">
+<li>Enable S3 Transfer Acceleration on the bucket.</li>
+<li>Create a CloudFront distribution with the bucket as origin and serve content via CloudFront URLs.</li>
+<li>Replicate the bucket to every user region with CRR and route by geolocation.</li>
+<li>Move the application to larger EC2 instances.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>CloudFront caches at 400+ edge locations</b>, so repeat requests never cross an ocean. One origin copy, no app rewrite, and lower S3 egress since edge hits don't touch the origin — every stated constraint satisfied.</p>
+<p class="no"><b>A</b> — Transfer Acceleration speeds <b>uploads to</b> S3, not downloads to viewers. <b>C</b> — works but duplicates storage per region and adds replication/routing complexity the question ruled out. <b>D</b> — the bottleneck is geography, not compute.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q30</span><span class="stamp">Performance</span><span class="topic">DynamoDB Accelerator (DAX)</span></div><div class="qb">
+<p class="sc">A product-catalog DynamoDB table serves an extremely <b>read-heavy</b>, read-mostly workload. Latency must drop from single-digit milliseconds to <b>microseconds</b> with <b>minimal application changes</b>. What do you deploy?</p>
+<ol class="opts">
+<li>An ElastiCache Redis cluster with app-managed cache-aside logic.</li>
+<li>DynamoDB Accelerator (DAX) via the DAX SDK client.</li>
+<li>Provision much higher RCUs on the table.</li>
+<li>Convert the table to a global table.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>DAX</b> is a write-through/read-through cache that is <b>API-compatible with DynamoDB</b> — swap the client, keep the code, get <b>microsecond</b> cache-hit reads.</p>
+<p class="no"><b>A</b> — Redis can hit microseconds too, but you must write and maintain cache-aside/invalidation logic — the "minimal changes" constraint kills it. <b>C</b> — more RCUs buys throughput, not lower latency; DynamoDB stays millisecond-class. <b>D</b> — global tables address geography, not per-request latency.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q31</span><span class="stamp">Performance</span><span class="topic">EBS volume type selection</span></div><div class="qb">
+<p class="sc">A database on EC2 needs a <b>500 GB volume delivering a consistent 10,000 IOPS</b>. Cost must be as low as possible while meeting the target. Which EBS volume type?</p>
+<ol class="opts">
+<li>gp2, sized to 500 GB.</li>
+<li>gp3 with 10,000 provisioned IOPS.</li>
+<li>io2 with 10,000 provisioned IOPS.</li>
+<li>st1 throughput-optimized HDD.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>gp3 decouples IOPS from size</b>: baseline 3,000, provisionable to 16,000 — so a 500 GB gp3 volume can be dialed to exactly 10,000 IOPS at a fraction of io2's price. Cheapest option that meets spec wins.</p>
+<p class="no"><b>A</b> — gp2 ties IOPS to size (3 IOPS/GB): 500 GB ≈ 1,500 IOPS; you'd need ~3.3 TB just to buy performance. <b>C</b> — meets spec but costs more; reserve io2 for &gt;16K IOPS or durability-critical needs. <b>D</b> — HDD tops out around 500 IOPS; wrong medium entirely.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q32</span><span class="stamp">Performance</span><span class="topic">Placement groups</span></div><div class="qb">
+<p class="sc">A tightly coupled <b>HPC simulation</b> runs across 20 EC2 instances that exchange data constantly. You must <b>minimize inter-node network latency and maximize throughput</b> between them. Which placement strategy?</p>
+<ol class="opts">
+<li>A spread placement group.</li>
+<li>A partition placement group across 3 AZs.</li>
+<li>A cluster placement group in a single AZ with enhanced networking.</li>
+<li>Distribute the instances across three AZs for resilience.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p><b>Cluster placement</b> packs instances onto the same high-bisection network segment in one AZ — the lowest possible node-to-node latency and highest throughput, which is the entire game for tightly coupled HPC.</p>
+<p class="no"><b>A</b> — spread does the <i>opposite</i>: anti-affinity across hardware (max 7/AZ) for fault isolation. <b>B</b> — partition groups isolate replica sets for big-data systems, not latency. <b>D</b> — cross-AZ hops add latency; here performance explicitly outranks AZ resilience.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q33</span><span class="stamp">Performance</span><span class="topic">Global Accelerator vs CloudFront</span></div><div class="qb">
+<p class="sc">A multiplayer game uses a <b>custom UDP protocol</b> to reach game servers behind Network Load Balancers in two regions. Players worldwide need <b>lower latency, two static anycast IPs</b> for allow-listing, and <b>near-instant regional failover</b>. Which service?</p>
+<ol class="opts">
+<li>Amazon CloudFront.</li>
+<li>AWS Global Accelerator in front of the NLBs.</li>
+<li>Route 53 latency-based routing.</li>
+<li>S3 Transfer Acceleration.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>Three tells: <b>UDP</b> (CloudFront is HTTP/S only), <b>static anycast IPs</b> (Global Accelerator's signature feature), and <b>fast failover</b> (endpoint health steering on the AWS backbone in seconds, no DNS caching in the way).</p>
+<p class="no"><b>A</b> — wrong protocol layer: CDN for HTTP content, not raw UDP flows. <b>C</b> — DNS answers get cached by resolvers, so failover is slow and IPs aren't static. <b>D</b> — S3 uploads only; unrelated.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q34</span><span class="stamp">Performance</span><span class="topic">Athena serverless queries</span></div><div class="qb">
+<p class="sc">Analysts need to run <b>occasional ad-hoc SQL</b> over terabytes of CSV/JSON logs already sitting in S3. There is <b>no budget for standing infrastructure</b>; pay only when a query runs. Which approach?</p>
+<ol class="opts">
+<li>Load the data into a provisioned Redshift cluster.</li>
+<li>Import the files into RDS PostgreSQL nightly.</li>
+<li>Catalog the data with a Glue crawler and query in place with Amazon Athena.</li>
+<li>Spin up an EMR cluster with Hive for each analysis.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p><b>Athena queries S3 in place</b> — serverless, standard SQL, billed per TB scanned. A <b>Glue crawler</b> builds the table schema automatically. Zero infrastructure between queries is exactly the constraint.</p>
+<p class="no"><b>A</b> — a provisioned cluster bills 24/7 for occasional use. <b>B</b> — nightly ETL into an OLTP engine for TB-scale scans is slow, costly, and stale. <b>D</b> — EMR means cluster spin-up and management per session; "occasional ad-hoc" says serverless.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q35</span><span class="stamp">Performance</span><span class="topic">FSx family selection</span></div><div class="qb">
+<p class="sc">A lift-and-shift brings <b>Windows applications</b> that require <b>SMB file shares, NTFS ACLs, and Active Directory integration</b>. Which AWS storage service do they mount?</p>
+<ol class="opts">
+<li>Amazon EFS.</li>
+<li>Amazon FSx for Windows File Server.</li>
+<li>Amazon FSx for Lustre.</li>
+<li>S3 with File Gateway.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>The keyword triple <b>SMB + NTFS + AD</b> maps one-to-one onto <b>FSx for Windows File Server</b> — a fully managed native Windows file system.</p>
+<p class="no"><b>A</b> — EFS is NFS for Linux; no SMB, no NTFS ACLs. <b>C</b> — Lustre is the HPC/ML scratch file system; hearing "machine learning / hundreds of GB/s" is its cue, not Windows shares. <b>D</b> — File Gateway serves S3-backed shares for hybrid caching, not a native NTFS/AD experience.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q36</span><span class="stamp">Performance</span><span class="topic">RDS Proxy connection pooling</span></div><div class="qb">
+<p class="sc">Hundreds of concurrent <b>Lambda functions</b> open connections to RDS PostgreSQL, and the database keeps hitting <b>too-many-connections</b> errors during bursts. Writes and reads both occur. What is the managed fix?</p>
+<ol class="opts">
+<li>Move to a much larger DB instance class.</li>
+<li>Add read replicas and point Lambdas at them.</li>
+<li>Put Amazon RDS Proxy between Lambda and the database.</li>
+<li>Cache all queries in ElastiCache.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p>The failure mode is <b>connection churn</b>, not query load. <b>RDS Proxy pools and multiplexes</b> thousands of ephemeral Lambda connections onto a small warm set of DB connections, absorbing bursts and even speeding failover.</p>
+<p class="no"><b>A</b> — buys a higher connection ceiling until the next burst; costs scale badly. <b>B</b> — replicas are read-only; the errors include writers. <b>D</b> — caching helps reads but doesn't stop hundreds of functions from opening connections.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q37</span><span class="stamp">Performance</span><span class="topic">S3 Transfer Acceleration</span></div><div class="qb">
+<p class="sc">Field teams on several continents upload <b>multi-gigabyte video files to one central S3 bucket</b> in us-east-1. Uploads over the public internet are slow and flaky. What speeds them up with minimal change?</p>
+<ol class="opts">
+<li>Enable S3 Transfer Acceleration and use multipart upload against the accelerated endpoint.</li>
+<li>Put CloudFront in front of the bucket.</li>
+<li>Ship Snowball devices from each site weekly.</li>
+<li>Create one bucket per continent and merge nightly.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: A</span>
+<p><b>Transfer Acceleration</b> routes uploads into the nearest CloudFront edge and carries them to the bucket on the <b>AWS backbone</b>, skipping the messy public-internet middle mile; <b>multipart upload</b> adds parallelism and resumability for large files. One endpoint change.</p>
+<p class="no"><b>B</b> — CloudFront is a download-side CDN; TA is the upload-optimized product built on the same edges. <b>C</b> — days of latency for a continuous workflow. <b>D</b> — multiplies buckets and adds a merge pipeline: complexity, not speed.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q38</span><span class="stamp">Performance</span><span class="topic">Redshift for OLAP</span></div><div class="qb">
+<p class="sc">BI teams run <b>complex aggregations joining billions of rows</b> across sales, inventory, and customer tables — queries that take hours on the RDS MySQL production replica. Which datastore is designed for this workload?</p>
+<ol class="opts">
+<li>A larger RDS MySQL instance.</li>
+<li>Amazon Redshift (columnar data warehouse).</li>
+<li>DynamoDB with secondary indexes.</li>
+<li>Amazon Neptune.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>Scanning and aggregating billions of rows is <b>OLAP</b>: <b>Redshift's columnar storage, compression, and massively parallel processing</b> read only the needed columns across many nodes — the architecture built for exactly these joins.</p>
+<p class="no"><b>A</b> — row-based OLTP engines read whole rows; bigger hardware shifts, not solves, the mismatch. <b>C</b> — DynamoDB has no joins or ad-hoc aggregation. <b>D</b> — Neptune is a graph database for relationship traversal, not tabular analytics.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q39</span><span class="stamp">Performance</span><span class="topic">SNS → SQS fan-out</span></div><div class="qb">
+<p class="sc">When an order is placed, <b>three independent systems</b> — invoicing, shipping, analytics — must each receive and process the event <b>at their own pace</b>, with failures in one never affecting the others. What is the pattern?</p>
+<figure class="dg"><svg viewBox="0 0 720 210" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SNS fan-out to multiple SQS queues">
+<defs><marker id="ar39" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 z" fill="#0b2545"/></marker></defs>
+<rect x="20" y="82" width="130" height="46" rx="6" fill="#fff" stroke="#0b2545" stroke-width="2"/>
+<text x="85" y="110" font-family="sans-serif" font-size="12" text-anchor="middle" font-weight="bold">Order service</text>
+<rect x="220" y="82" width="140" height="46" rx="23" fill="#fdf0e7" stroke="#c2410c" stroke-width="2"/>
+<text x="290" y="110" font-family="sans-serif" font-size="12.5" text-anchor="middle" font-weight="bold" fill="#0b2545">SNS topic</text>
+<line x1="150" y1="105" x2="216" y2="105" stroke="#0b2545" stroke-width="2" marker-end="url(#ar39)"/>
+<text x="183" y="96" font-family="monospace" font-size="9" text-anchor="middle" fill="#54657e">publish 1x</text>
+<rect x="470" y="20" width="150" height="40" rx="6" fill="#e8f6f9" stroke="#0e7490"/><text x="545" y="45" font-family="sans-serif" font-size="11.5" text-anchor="middle">SQS &#8594; Invoicing</text>
+<rect x="470" y="85" width="150" height="40" rx="6" fill="#e8f6f9" stroke="#0e7490"/><text x="545" y="110" font-family="sans-serif" font-size="11.5" text-anchor="middle">SQS &#8594; Shipping</text>
+<rect x="470" y="150" width="150" height="40" rx="6" fill="#e8f6f9" stroke="#0e7490"/><text x="545" y="175" font-family="sans-serif" font-size="11.5" text-anchor="middle">SQS &#8594; Analytics</text>
+<line x1="360" y1="94" x2="466" y2="44" stroke="#0b2545" stroke-width="1.8" marker-end="url(#ar39)"/>
+<line x1="360" y1="105" x2="466" y2="105" stroke="#0b2545" stroke-width="1.8" marker-end="url(#ar39)"/>
+<line x1="360" y1="116" x2="466" y2="166" stroke="#0b2545" stroke-width="1.8" marker-end="url(#ar39)"/>
+<text x="655" y="108" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#15803d">isolated,
+</text><text x="655" y="121" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#15803d">own pace</text>
+</svg><figcaption>Fig. Q39 — Publish once; each subscriber queue buffers its own copy. One slow consumer starves no one.</figcaption></figure>
+<ol class="opts">
+<li>One SQS queue with all three systems polling it.</li>
+<li>An SNS topic with three SQS queue subscriptions — one per system.</li>
+<li>The order service calls each system's API in sequence.</li>
+<li>A Kinesis stream with a single shared consumer application.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>Fan-out</b>: publish once to SNS; each subscribed SQS queue gets its <b>own durable copy</b>, so every system consumes independently, buffered against its own outages, with per-queue DLQs and filtering available.</p>
+<p class="no"><b>A</b> — one queue means <i>competing</i> consumers: each message is processed by exactly one system, not all three. <b>C</b> — synchronous chaining couples all three; one failure blocks the order path. <b>D</b> — workable but a single shared consumer app recouples the teams; the classic decoupled answer is SNS + SQS.</p>
+</div></details></div></div>
+
+<div class="q d3"><div class="qh"><span class="qn">Q40</span><span class="stamp">Performance</span><span class="topic">Auto Scaling policy mix</span></div><div class="qb">
+<p class="sc">A trading dashboard's traffic <b>spikes sharply every weekday at 9:00 AM</b> when markets open, then varies unpredictably through the day. Reactive scaling alone arrives too late for the opening bell. What policy combination fits?</p>
+<ol class="opts">
+<li>Target tracking on average CPU only.</li>
+<li>A scheduled scaling action pre-warming capacity before 9:00 AM, plus target tracking for the rest of the day.</li>
+<li>Manual scaling by the on-call engineer each morning.</li>
+<li>A step scaling policy with tighter CPU thresholds.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>Known, time-based demand → scheduled scaling</b> (capacity is already warm at 8:45); <b>unknown intra-day demand → target tracking</b>. The exam loves this combination because each policy covers the other's blind spot.</p>
+<p class="no"><b>A &amp; D</b> — any reactive policy needs the spike to <i>happen first</i>, then minutes of launch time: too late for a cliff-edge open. <b>C</b> — human-scheduled scaling is what scheduled actions automate away.</p>
+</div></details></div></div>
+<!-- ══════════ DOMAIN 4 ══════════ -->
+<section class="dom d4" id="d4">
+  <div class="kicker">Domain 4 · 20% of scored content</div>
+  <h2>Design Cost-Optimized Architectures</h2>
+  <p>Right storage class, right purchase model, and never pay a NAT gateway to reach S3.</p>
+</section>
+
+<div class="q d4"><div class="qh"><span class="qn">Q41</span><span class="stamp">Cost</span><span class="topic">S3 lifecycle design</span></div><div class="qb">
+<p class="sc">Application logs land in S3. Access pattern is <b>known</b>: heavy analysis for 30 days, rare lookups until day 90, then retained <b>7 years purely for audit</b> (retrieval within 12 hours is acceptable). Design the lowest-cost storage plan.</p>
+<figure class="dg"><svg viewBox="0 0 720 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="S3 lifecycle timeline across storage classes">
+<defs><marker id="ar41" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 z" fill="#0b2545"/></marker></defs>
+<line x1="30" y1="112" x2="700" y2="112" stroke="#0b2545" stroke-width="2" marker-end="url(#ar41)"/>
+<text x="30" y="132" font-family="monospace" font-size="10" fill="#54657e">day 0</text>
+<text x="255" y="132" font-family="monospace" font-size="10" fill="#54657e">day 30</text>
+<text x="455" y="132" font-family="monospace" font-size="10" fill="#54657e">day 90</text>
+<text x="648" y="132" font-family="monospace" font-size="10" fill="#54657e">year 7</text>
+<rect x="30" y="36" width="212" height="56" rx="6" fill="#eaf6ee" stroke="#15803d" stroke-width="2"/>
+<text x="136" y="60" font-family="sans-serif" font-size="12" text-anchor="middle" font-weight="bold">S3 Standard</text>
+<text x="136" y="78" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">hot: daily analysis</text>
+<rect x="256" y="36" width="186" height="56" rx="6" fill="#e8f6f9" stroke="#0e7490" stroke-width="2"/>
+<text x="349" y="60" font-family="sans-serif" font-size="12" text-anchor="middle" font-weight="bold">Standard-IA</text>
+<text x="349" y="78" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">rare reads, instant</text>
+<rect x="456" y="36" width="220" height="56" rx="6" fill="#f3eefe" stroke="#6d28d9" stroke-width="2"/>
+<text x="566" y="60" font-family="sans-serif" font-size="12" text-anchor="middle" font-weight="bold">Glacier Deep Archive</text>
+<text x="566" y="78" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">audit only &#8594; expire @ 7y</text>
+</svg><figcaption>Fig. Q41 — Known access pattern → deterministic lifecycle transitions beat any adaptive tiering on price.</figcaption></figure>
+<ol class="opts">
+<li>Keep everything in S3 Standard for 7 years for simplicity.</li>
+<li>Lifecycle rule: Standard → Standard-IA at 30 days → Glacier Deep Archive at 90 days → expire at 7 years.</li>
+<li>Use S3 Intelligent-Tiering for the entire lifespan.</li>
+<li>Lifecycle rule moving objects to Glacier Deep Archive on day 1.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>The pattern is <b>known and time-based</b>, so a deterministic lifecycle wins: IA cuts storage cost ~45% once reads become rare, and <b>Deep Archive</b> (cheapest class; standard retrieval ~12h — within the stated tolerance) carries the 7-year audit tail. Expiration ends the spend on schedule.</p>
+<p class="no"><b>A</b> — pays hot-storage prices for 7 years of cold data. <b>C</b> — Intelligent-Tiering earns its monitoring fee when patterns are <i>unknown</i>; here you'd pay it to discover what you already told it. <b>D</b> — 30 days of heavy analysis against a 12-hour-retrieval archive class breaks the workload (and retrieval fees explode).</p>
+</div></details></div></div>
+
+<div class="q d4"><div class="qh"><span class="qn">Q42</span><span class="stamp">Cost</span><span class="topic">Spot for interruptible work</span></div><div class="qb">
+<p class="sc">A nightly video-transcoding pipeline is <b>stateless, checkpointed, and fully fault-tolerant</b> — any interrupted job simply re-queues. Runs take 2–6 hours with no deadline pressure. Which purchase option minimizes compute cost?</p>
+<ol class="opts">
+<li>On-Demand instances.</li>
+<li>3-year Standard Reserved Instances.</li>
+<li>Spot Instances (diversified across instance types/pools).</li>
+<li>Dedicated Hosts.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p>The scenario recites the <b>Spot checklist</b> — stateless, checkpointed, interruption-tolerant, flexible timing — and Spot pays for it with <b>up to ~90% off On-Demand</b>. Diversifying pools softens interruption risk further.</p>
+<p class="no"><b>A</b> — full price for a workload that doesn't need the guarantee. <b>B</b> — RIs suit <i>steady 24/7</i> baselines, not a nightly batch window. <b>D</b> — the most expensive option, for licensing/compliance needs that aren't present.</p>
+</div></details></div></div>
+
+<div class="q d4"><div class="qh"><span class="qn">Q43</span><span class="stamp">Cost</span><span class="topic">Intelligent-Tiering</span></div><div class="qb">
+<p class="sc">A media archive holds millions of objects whose access pattern is <b>completely unpredictable</b> — some files go viral years later, others are never touched. Finance wants automatic savings with <b>no retrieval fees and no performance surprises</b>. Which storage class?</p>
+<ol class="opts">
+<li>S3 Standard-IA for everything.</li>
+<li>S3 Intelligent-Tiering.</li>
+<li>S3 Glacier Flexible Retrieval.</li>
+<li>Manually crafted lifecycle rules per folder.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>Intelligent-Tiering</b> is built for unknown patterns: it moves each object between access tiers based on observed use, charges a small monitoring fee, and — the clincher — has <b>no retrieval fees</b> and no minimum-duration penalty on the default tiers, so a viral spike costs nothing extra.</p>
+<p class="no"><b>A</b> — IA charges per-GB retrieval and a 30-day minimum: unpredictable access makes those fees unpredictable too. <b>C</b> — minutes-to-hours retrieval breaks "no performance surprises." <b>D</b> — hand-written rules require the very knowledge the scenario says you lack.</p>
+</div></details></div></div>
+
+<div class="q d4"><div class="qh"><span class="qn">Q44</span><span class="stamp">Cost</span><span class="topic">Kill the NAT data charge</span></div><div class="qb">
+<p class="sc">Cost Explorer shows large <b>NAT gateway data-processing charges</b>. Investigation reveals private-subnet EC2 instances pushing <b>terabytes to S3</b> in the same region through the NAT gateway. What change eliminates most of this cost?</p>
+<figure class="dg"><svg viewBox="0 0 720 205" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NAT gateway path versus free gateway endpoint path to S3">
+<defs><marker id="ar44" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto"><path d="M0,0 L8,3.5 L0,7 z" fill="#0b2545"/></marker></defs>
+<rect x="24" y="70" width="140" height="50" rx="6" fill="#fff" stroke="#0b2545" stroke-width="2"/>
+<text x="94" y="92" font-family="sans-serif" font-size="12" text-anchor="middle" font-weight="bold">EC2 (private)</text>
+<text x="94" y="109" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#54657e">TBs &#8594; S3</text>
+<rect x="290" y="16" width="160" height="46" rx="6" fill="#fff" stroke="#b23b3b" stroke-width="2"/>
+<text x="370" y="36" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#b23b3b" font-weight="bold">NAT gateway</text>
+<text x="370" y="52" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#b23b3b">$$ per GB processed</text>
+<rect x="290" y="140" width="160" height="46" rx="6" fill="#e8f6f9" stroke="#0e7490" stroke-width="2"/>
+<text x="370" y="160" font-family="sans-serif" font-size="12" text-anchor="middle" fill="#0b2545" font-weight="bold">Gateway endpoint</text>
+<text x="370" y="176" font-family="monospace" font-size="9.5" text-anchor="middle" fill="#15803d">$0 · route table entry</text>
+<rect x="556" y="78" width="140" height="50" rx="6" fill="#eaf6ee" stroke="#15803d" stroke-width="2"/>
+<text x="626" y="108" font-family="sans-serif" font-size="13" text-anchor="middle" font-weight="bold" fill="#0b2545">Amazon S3</text>
+<line x1="164" y1="84" x2="286" y2="42" stroke="#b23b3b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar44)"/>
+<line x1="450" y1="40" x2="556" y2="86" stroke="#b23b3b" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ar44)"/>
+<text x="228" y="52" font-family="monospace" font-size="9.5" fill="#b23b3b">BEFORE</text>
+<line x1="164" y1="108" x2="286" y2="160" stroke="#15803d" stroke-width="2.4" marker-end="url(#ar44)"/>
+<line x1="450" y1="162" x2="556" y2="116" stroke="#15803d" stroke-width="2.4" marker-end="url(#ar44)"/>
+<text x="228" y="152" font-family="monospace" font-size="9.5" fill="#15803d">AFTER</text>
+</svg><figcaption>Fig. Q44 — Same traffic, new route: the gateway endpoint has no hourly or per-GB charge for S3.</figcaption></figure>
+<ol class="opts">
+<li>Replace the NAT gateway with a larger one for volume pricing.</li>
+<li>Add a Gateway VPC endpoint for S3 to the private subnets' route tables.</li>
+<li>Add a second NAT gateway to split the load.</li>
+<li>Create an Interface VPC endpoint for S3.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>The <b>gateway endpoint</b> carries S3-bound traffic directly over the AWS network with <b>no hourly charge and no per-GB charge</b> — the terabytes stop touching the NAT entirely, so the data-processing line item collapses.</p>
+<p class="no"><b>A &amp; C</b> — NAT pricing has no volume discount and two NATs double the hourly cost; per-GB charges continue either way. <b>D</b> — an interface endpoint works but bills hourly + per-GB; for pure S3 cost elimination, gateway wins.</p>
+</div></details></div></div>
+
+<div class="q d4"><div class="qh"><span class="qn">Q45</span><span class="stamp">Cost</span><span class="topic">Savings Plans selection</span></div><div class="qb">
+<p class="sc">A company has a <b>steady compute baseline</b> spread across <b>EC2 instances of changing families in three regions, Fargate tasks, and Lambda</b>. They'll commit spend for 3 years but need freedom to keep re-architecting. Which commitment fits?</p>
+<ol class="opts">
+<li>Standard Reserved Instances for the current instance types.</li>
+<li>EC2 Instance Savings Plans in each region.</li>
+<li>Compute Savings Plans.</li>
+<li>Spot Instances for the entire baseline.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p><b>Compute Savings Plans</b> commit to $/hour of compute and automatically apply <b>across any EC2 family, size, region, OS — plus Fargate and Lambda</b>. Maximum flexibility for a shape-shifting architecture, still deep discounts.</p>
+<p class="no"><b>A</b> — Standard RIs lock family/region; every re-architecture strands the commitment. <b>B</b> — EC2 Instance SPs are cheaper per-hour but locked to a family+region and cover EC2 only — no Fargate/Lambda. <b>D</b> — Spot is interruptible; a steady always-on baseline can't live on it.</p>
+</div></details></div></div>
+
+<div class="q d4"><div class="qh"><span class="qn">Q46</span><span class="stamp">Cost</span><span class="topic">Serverless for idle-heavy APIs</span></div><div class="qb">
+<p class="sc">An internal API receives <b>a few thousand requests per day at unpredictable times</b>, each finishing in under a second. It currently runs on two always-on EC2 instances that sit <b>~99% idle</b>. What is the most cost-effective re-platform?</p>
+<ol class="opts">
+<li>Downsize to one smaller EC2 instance.</li>
+<li>API Gateway + Lambda, paying per request.</li>
+<li>An ECS cluster on EC2 with two services.</li>
+<li>Elastic Beanstalk with a single always-on environment.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p>Sparse, short, unpredictable invocations are the <b>serverless sweet spot</b>: with Lambda + API Gateway you pay per request and per ms of execution — <b>idle time costs zero</b>. A few thousand sub-second calls a day lands near the free tier.</p>
+<p class="no"><b>A</b> — smaller idle is still 24/7 billing, plus a new single point of failure. <b>C &amp; D</b> — both keep always-on instances underneath; the 99%-idle problem survives the re-platforming.</p>
+</div></details></div></div>
+
+<div class="q d4"><div class="qh"><span class="qn">Q47</span><span class="stamp">Cost</span><span class="topic">Egress cost via CloudFront</span></div><div class="qb">
+<p class="sc">A media site serves images directly from S3 to global users. The bill shows heavy <b>S3 data-transfer-out (egress) and request charges</b>. Without moving the data, how do you cut delivery cost <b>and</b> improve speed?</p>
+<ol class="opts">
+<li>Serve through a CloudFront distribution with the bucket as origin.</li>
+<li>Compress images and keep serving directly from S3.</li>
+<li>Move the bucket to the cheapest region.</li>
+<li>Switch the objects to Standard-IA.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: A</span>
+<p>Two economics work in CloudFront's favor: <b>S3 → CloudFront origin transfer is free</b>, and cached edge hits never generate S3 requests at all — you pay CloudFront's (generally cheaper, cache-discounted) egress instead of raw S3 egress. Users get edge latency as a bonus.</p>
+<p class="no"><b>B</b> — helps a little, but every byte still exits S3 at S3 rates. <b>C</b> — regional price deltas are marginal and now everyone is far from the data. <b>D</b> — IA cuts <i>storage</i> cost but <b>adds per-GB retrieval fees</b> on a frequently read workload: the bill goes up.</p>
+</div></details></div></div>
+
+<div class="q d4"><div class="qh"><span class="qn">Q48</span><span class="stamp">Cost</span><span class="topic">Cost visibility &amp; attribution</span></div><div class="qb">
+<p class="sc">Finance must <b>attribute AWS spend to departments and projects</b> across a multi-account organization and let team leads slice it themselves. What is the foundational setup?</p>
+<ol class="opts">
+<li>Consolidated billing via Organizations, enforce resource tagging, activate cost allocation tags, analyze in Cost Explorer / CUR.</li>
+<li>Export CloudWatch metrics to a spreadsheet monthly.</li>
+<li>Create one IAM group per department.</li>
+<li>Ask each team to screenshot its bill.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: A</span>
+<p>The chain is: <b>Organizations</b> rolls all accounts into one bill → <b>tags</b> (e.g., Department, Project) label resources → <b>activating cost allocation tags</b> makes those tags billing dimensions → <b>Cost Explorer / Cost &amp; Usage Report</b> group and filter by them. Add AWS Budgets for proactive alerts.</p>
+<p class="no"><b>B</b> — CloudWatch measures performance, not dollars. <b>C</b> — IAM organizes <i>permissions</i>; it is invisible to billing. <b>D</b> — not a system.</p>
+</div></details></div></div>
+
+<div class="q d4"><div class="qh"><span class="qn">Q49</span><span class="stamp">Cost</span><span class="topic">Aurora Serverless for spiky dev DBs</span></div><div class="qb">
+<p class="sc">A development team's relational database is used <b>a few unpredictable hours per day</b> and sits idle otherwise — but must be <b>instantly available</b> whenever someone connects, with no capacity management. What minimizes cost?</p>
+<ol class="opts">
+<li>A provisioned RDS instance stopped and started by cron scripts.</li>
+<li>Aurora Serverless, scaling with demand and down to minimal/zero capacity when idle.</li>
+<li>A provisioned RDS instance sized for peak, running 24/7.</li>
+<li>DynamoDB on-demand mode.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: B</span>
+<p><b>Aurora Serverless</b> bills by capacity units actually consumed, scaling up on connection demand and down toward zero when idle — intermittent + unpredictable + hands-off is its exact design brief.</p>
+<p class="no"><b>A</b> — cron windows and "unpredictable hours" contradict each other; RDS stop also auto-restarts after 7 days, and cold starts take minutes. <b>C</b> — pays peak price for ~90% idle. <b>D</b> — the team needs a <i>relational</i> database; on-demand pricing doesn't change the engine mismatch.</p>
+</div></details></div></div>
+
+<div class="q d4"><div class="qh"><span class="qn">Q50</span><span class="stamp">Cost</span><span class="topic">Glacier retrieval tiers</span></div><div class="qb">
+<p class="sc">Compliance archives live in <b>S3 Glacier Flexible Retrieval</b>. Auditors occasionally request batches of documents and accept delivery <b>any time within 12 hours</b>. Which retrieval tier keeps these requests cheapest?</p>
+<ol class="opts">
+<li>Expedited retrieval (1–5 minutes).</li>
+<li>Standard retrieval (3–5 hours).</li>
+<li>Bulk retrieval (5–12 hours).</li>
+<li>Move the archive to S3 Standard so retrieval is instant.</li>
+</ol>
+<details class="ans"><summary>Answer &amp; reasoning</summary><div class="ax">
+<span class="key">Correct: C</span>
+<p>Retrieval tiers trade speed for price; <b>Bulk is the cheapest</b> (large restores at the lowest per-GB rate) and its 5–12-hour window sits exactly inside the auditors' 12-hour tolerance. Pay for the speed you need — never more.</p>
+<p class="no"><b>A</b> — minutes-fast at the highest price for a deadline measured in hours. <b>B</b> — meets the deadline but costs more than Bulk for no required benefit. <b>D</b> — hot storage 24/7/365 to serve occasional audits inverts the entire cost model.</p>
+</div></details></div></div>
+
+<!-- ══════════ ANSWER KEY ══════════ -->
+<section class="dom" id="key" style="--dc:var(--navy)">
+  <div class="kicker">Appendix · Sheet 02</div>
+  <h2>Answer Key — all 50</h2>
+</section>
+<div class="keygrid">
+<div class="kcell"><span>Q1</span><b>B</b></div><div class="kcell"><span>Q2</span><b>B</b></div><div class="kcell"><span>Q3</span><b>C</b></div><div class="kcell"><span>Q4</span><b>B</b></div><div class="kcell"><span>Q5</span><b>B</b></div>
+<div class="kcell"><span>Q6</span><b>A</b></div><div class="kcell"><span>Q7</span><b>C</b></div><div class="kcell"><span>Q8</span><b>B</b></div><div class="kcell"><span>Q9</span><b>C</b></div><div class="kcell"><span>Q10</span><b>B</b></div>
+<div class="kcell"><span>Q11</span><b>C</b></div><div class="kcell"><span>Q12</span><b>B</b></div><div class="kcell"><span>Q13</span><b>B</b></div><div class="kcell"><span>Q14</span><b>A</b></div><div class="kcell"><span>Q15</span><b>B</b></div>
+<div class="kcell"><span>Q16</span><b>B</b></div><div class="kcell"><span>Q17</span><b>B</b></div><div class="kcell"><span>Q18</span><b>C</b></div><div class="kcell"><span>Q19</span><b>C</b></div><div class="kcell"><span>Q20</span><b>C</b></div>
+<div class="kcell"><span>Q21</span><b>B</b></div><div class="kcell"><span>Q22</span><b>C</b></div><div class="kcell"><span>Q23</span><b>B</b></div><div class="kcell"><span>Q24</span><b>C</b></div><div class="kcell"><span>Q25</span><b>B</b></div>
+<div class="kcell"><span>Q26</span><b>B</b></div><div class="kcell"><span>Q27</span><b>B</b></div><div class="kcell"><span>Q28</span><b>B</b></div><div class="kcell"><span>Q29</span><b>B</b></div><div class="kcell"><span>Q30</span><b>B</b></div>
+<div class="kcell"><span>Q31</span><b>B</b></div><div class="kcell"><span>Q32</span><b>C</b></div><div class="kcell"><span>Q33</span><b>B</b></div><div class="kcell"><span>Q34</span><b>C</b></div><div class="kcell"><span>Q35</span><b>B</b></div>
+<div class="kcell"><span>Q36</span><b>C</b></div><div class="kcell"><span>Q37</span><b>A</b></div><div class="kcell"><span>Q38</span><b>B</b></div><div class="kcell"><span>Q39</span><b>B</b></div><div class="kcell"><span>Q40</span><b>B</b></div>
+<div class="kcell"><span>Q41</span><b>B</b></div><div class="kcell"><span>Q42</span><b>C</b></div><div class="kcell"><span>Q43</span><b>B</b></div><div class="kcell"><span>Q44</span><b>B</b></div><div class="kcell"><span>Q45</span><b>C</b></div>
+<div class="kcell"><span>Q46</span><b>B</b></div><div class="kcell"><span>Q47</span><b>A</b></div><div class="kcell"><span>Q48</span><b>A</b></div><div class="kcell"><span>Q49</span><b>B</b></div><div class="kcell"><span>Q50</span><b>C</b></div>
+</div>
+
+<footer>Original practice material written for study purposes · Not affiliated with AWS · Answer letters reference option order as printed · Rev A</footer>
+</div>
+</body>
+</html>
